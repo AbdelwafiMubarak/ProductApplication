@@ -1,0 +1,39 @@
+<div class="login-container">
+    <p-card class="login-card">
+        <ng-template pTemplate="title">
+            <h2>🔐 Login</h2>
+        </ng-template>
+
+        <ng-template pTemplate="content">
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+                <!-- Email Field -->
+                <div class="p-field">
+                    <label for="email">📧 Email</label>
+                    <input pInputText id="email" type="email" formControlName="email" placeholder="Enter your email">
+                    <small class="error-message"
+                        *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+                        Valid email is required
+                    </small>
+                </div>
+
+                <!-- Password Field -->
+                <div class="p-field">
+                    <label for="password">🔑 Password</label>
+                    <p-password [inputStyle]="{'width':'100%'}" [style]="{'width':'100%'}" id="password"
+                        formControlName="password" [toggleMask]="true" [feedback]="false"
+                        placeholder="Enter your password" />
+                    <small class="error-message"
+                        *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+                        Password must be at least 6 characters
+                    </small>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="button-group">
+                    <p-button label="Login" icon="pi pi-sign-in" type="submit"
+                        [disabled]="loginForm.invalid"></p-button>
+                </div>
+            </form>
+        </ng-template>
+    </p-card>
+</div>

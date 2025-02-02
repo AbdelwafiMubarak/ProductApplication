@@ -1,18 +1,45 @@
-import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+// import { NgModule } from '@angular/core';
+// import { BrowserModule } from '@angular/platform-browser';
 
-import { AppRoutingModule } from './app-routing.module';
+// import { AppRoutingModule } from './app-routing.module';
+// import { AppComponent } from './app.component';
+// import { ButtonModule } from 'primeng/button';
+// import { NavbarComponent } from './Component/navbar/navbar.component';
+// import { LoginComponent } from './Component/login/login.component';
+
+// @NgModule({
+//   declarations: [
+
+
+
+//   ],
+//   imports: [
+//     BrowserModule,
+//     AppRoutingModule,
+//     ButtonModule,
+//     NavbarComponent, LoginComponent,AppComponent,
+//   ],
+//   providers: [],
+//   bootstrap: [AppComponent]
+// })
+// export class AppModule { }
+
+import { bootstrapApplication } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
+import { importProvidersFrom } from '@angular/core';
+import { provideRouter } from '@angular/router';
+import { BrowserModule } from '@angular/platform-browser';
+import { ButtonModule } from 'primeng/button';
+import { NavbarComponent } from './Component/navbar/navbar.component';
+import { LoginComponent } from './Component/login/login.component';
 
-@NgModule({
-  declarations: [
-    AppComponent
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule
-  ],
-  providers: [],
-  bootstrap: [AppComponent]
-})
+bootstrapApplication(AppComponent, {
+  providers: [
+    importProvidersFrom(BrowserModule, ButtonModule),
+    provideRouter([
+      { path: 'login', component: LoginComponent },
+      { path: '', component: NavbarComponent },
+    ]),
+  ]
+}).catch(err => console.error(err));
 export class AppModule { }

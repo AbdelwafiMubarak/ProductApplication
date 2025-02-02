@@ -1,0 +1,104 @@
+/* Center the login card */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(to right, #6a11cb, #2575fc);
+    /* ✅ Modern gradient background */
+}
+
+/* Styled Login Card */
+.login-card {
+    width: 380px;
+    padding: 25px;
+    background: #fff;
+    /* White background */
+    border-radius: 12px;
+    /* Rounded corners */
+    box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.2);
+    /* Soft shadow */
+    text-align: center;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Animation for fade-in effect */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Input fields */
+.p-field {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    margin-bottom: 15px;
+}
+
+.p-field label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+input.p-inputtext,
+.p-password input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.3s ease-in-out;
+}
+
+input.p-inputtext:focus,
+.p-password input:focus {
+    border-color: #2575fc;
+    box-shadow: 0 0 8px rgba(37, 117, 252, 0.2);
+}
+
+/* Submit Button */
+.button-group {
+    margin-top: 20px;
+}
+
+.p-button {
+    width: 100%;
+    background: #2575fc !important;
+    /* Primary color */
+    border: none !important;
+    padding: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.3s ease-in-out;
+}
+
+.p-button:hover {
+    background: #1e63d3 !important;
+    transform: translateY(-2px);
+}
+
+/* Error Message */
+.error-message {
+    color: #d9534f;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+/* Toast Notifications */
+.mat-snack-bar-container {
+    top: 20px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    position: fixed !important;
+    z-index: 10000 !important;
+}

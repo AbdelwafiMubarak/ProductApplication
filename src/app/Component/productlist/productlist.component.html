@@ -1,0 +1,73 @@
+<p-confirmDialog></p-confirmDialog>
+
+<p-card>
+    <ng-template pTemplate="title">Product Management
+        <button style="float: inline-end;" (click)="goToAddProduct()" pButton type="button" label="Add Product"
+            icon="pi pi-plus" class="p-button-success"></button></ng-template>
+    <ng-template pTemplate="content">
+        <p-table [value]="products" [paginator]="true" [rows]="4" [loading]="loading">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="id">ID <p-sortIcon field="id"></p-sortIcon></th>
+                    <th pSortableColumn="name">Name <p-sortIcon field="name"></p-sortIcon></th>
+                    <th pSortableColumn="description">Description <p-sortIcon field="description"></p-sortIcon></th>
+                    <th>Image</th>
+
+                    <th>Actions</th>
+                </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-product>
+                <tr>
+                    <td>{{ product.id }}</td>
+                    <td>{{ product.name }}</td>
+                    <td>{{ product.description }}</td>
+                    <td><img height="60" width="60" [src]="product.imageUrl" /></td>
+
+                    <td>
+                        <button pButton label="Edit" icon="pi pi-pencil" class="p-button-sm p-button-info"
+                            (click)="editProduct(product.id)"></button>
+                        <button pButton label="Delete" icon="pi pi-trash" class="p-button-sm p-button-danger ml-2"
+                            (click)="confirmDelete(product.id)"></button>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </ng-template>
+</p-card>
+
+<!-- ✅ Edit Product Dialog -->
+<p-dialog header="Edit Product" [(visible)]="displayEditDialog" [modal]="true" [closable]="true" [responsive]="true"
+    [style]="{width: '400px'}">
+    <div class="p-fluid">
+
+        <div class="p-field">
+            <img [src]="selectedProduct.imageUrl" />
+        </div><br>
+
+        <div class="p-field">
+            <label for="name">Product Name</label>
+            <input pInputText id="name" [(ngModel)]="selectedProduct.name" />
+        </div>
+        <div class="p-field">
+            <label for="description">Description</label>
+            <input pInputText id="description" [(ngModel)]="selectedProduct.description" />
+        </div>
+        <div class="p-field">
+            <label for="file">Product Image</label>
+            <input type="file" id="file" (change)="onFileChange($event)" />
+            <small class="error-message" *ngIf="fileError">
+                Please select an image file.
+            </small>
+        </div>
+
+
+
+    </div>
+    <ng-template pTemplate="footer">
+        <button pButton label="Save" icon="pi pi-check" class="p-button-sm p-button-success"
+            (click)="saveProduct()"></button>
+        <button pButton label="Cancel" icon="pi pi-times" class="p-button-sm p-button-secondary"
+            (click)="displayEditDialog=false"></button>
+    </ng-template>
+</p-dialog>

@@ -1,0 +1,14 @@
+<div class="home-container">
+    <p-card>
+        <ng-template pTemplate="title">Welcome to Product Management</ng-template>
+        <ng-template pTemplate="content">
+            <p>Manage your products easily with our intuitive interface.</p>
+            <div class="btn-group">
+                <button pButton type="button" label="View Products" icon="pi pi-list" class="p-button-primary"
+                    (click)="navigateTo('productlist')"></button>
+                <button pButton type="button" label="Add Product" icon="pi pi-plus" class="p-button-success"
+                    (click)="navigateTo('addproduct')"></button>
+            </div>
+        </ng-template>
+    </p-card>
+</div>
