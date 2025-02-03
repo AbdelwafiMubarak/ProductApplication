@@ -34,14 +34,14 @@
                 (click)="resetFilter()"></button>
 
             <p-dropdown [options]="priceRanges" [(ngModel)]="selectedPriceRange" placeholder="Filter by Price"
-                [style]="{ width: '100%' }" optionLabel="label" (onChange)="filterProductsnotyet()">
+                [style]="{ width: '100%' }" optionLabel="label" (onChange)="filterProductsByPrice()">
             </p-dropdown>
         </div>
 
 
         <br>
 
-
+        filterProductsByPrice();
 
 
         <p-table [value]="products" [paginator]="true" [rows]="4" [loading]="loading">
@@ -62,7 +62,9 @@
                     <td>{{ product.id }}</td>
                     <td>{{ product.name }}</td>
                     <td>{{ product.description }}</td>
-                    <td>{{ product.price }}</td>
+                    <!-- <td>{{ product.price }}</td> -->
+                    <td>{{ product.price | currency: 'USD':'symbol':'1.2-2' }}</td>
+
                     <td><img height="60" width="60" [src]="product.imageUrl" /></td>
 
                     <td>
@@ -108,8 +110,9 @@
         <div class="p-field">
             <label for="file">Product Image <span class="required">*</span></label>
 
-            <p-fileUpload name="productImage" accept="image/*" maxFileSize="1000000" (onSelect)="onFileChange($event)"
-                [auto]="true" [showUploadButton]="false" [showCancelButton]="true"></p-fileUpload>
+            <p-fileUpload #fileUpload name="productImage" accept="image/*" maxFileSize="1000000"
+                (onSelect)="onFileChange($event)" [auto]="true" [showUploadButton]="false"
+                [showCancelButton]="true"></p-fileUpload>
 
             <small class="error-message" *ngIf="fileError">
                 Please select a valid image file.

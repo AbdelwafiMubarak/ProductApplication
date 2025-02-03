@@ -42,14 +42,18 @@ export class ProductListComponent implements OnInit {
   apiUrl = 'https://localhost:44394/api/Product/GetAllAsync'; // Replace with your API endpoint
 
   priceRanges = [
-    { label: 'All', value: null },
+    { label: 'All', value: { min: 0, max: Infinity } },
     { label: 'Below $50', value: { min: 0, max: 50 } },
     { label: '$50 - $100', value: { min: 50, max: 100 } },
     { label: '$100 - $200', value: { min: 100, max: 200 } },
     { label: 'Above $200', value: { min: 200, max: Infinity } }
   ];
+  priceRanges2 = ['All', 'Below $50', '$50 - $100', '$100 - $200', 'Above $200'];
 
-  selectedPriceRange: { min: number, max: number } | null = null;
+
+  // selectedPriceRange: { min: number, max: number } | null = null;
+  selectedPriceRange: any;
+
 
   // ✅ Variables for editing
   displayEditDialog: boolean = false;
@@ -64,11 +68,14 @@ export class ProductListComponent implements OnInit {
   }
   filterText: string = "";
   fetchProducts(filter: string = "", priceRange: { min: number, max: number } | null = null) {
+
+
     const token = localStorage.getItem('authToken');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     this.loading = true;
-    if (priceRange) {
+    if (priceRange != null) {
 
+      console.log("filter price passed to the fetch");
 
       this.apiUrl = `https://localhost:44394/api/Product/GetProductPriceFilter?min=${priceRange.min}&max=${priceRange.max}`;
     }
@@ -215,21 +222,34 @@ export class ProductListComponent implements OnInit {
   }
 
   filterProducts() {
+    console.log("filterProducts");
     const filter = this.filterText;
-    // const priceRange = this.selectedPriceRange;
-
-    // // Check if priceRange is not null
-    // if (priceRange) {
-    //   console.log("Selected price range:", priceRange);
-    //   console.log("Selected price max:", priceRange.max);
-    //   console.log("Selected price max:", priceRange.max);
-
-    // //   console.log("Selected price range:", priceRange);
-    //   this.fetchProducts(filter, undefined);
-    // } else {
-    //   console.log("No price range selected.");
-    this.fetchProducts(filter); // Fetch products without any price range filter
+    this.fetchProducts(filter);
   }
+
+
+  filterProductsByPrice() {
+    const filter = this.filterText;
+    const priceRange: any = this.selectedPriceRange;
+
+    if (priceRange.value.min === 0 && priceRange.value.max === Infinity) {
+      this.fetchProducts(filter, { 'min': 0, 'max': 10000000 });
+      //this.fetchProducts(filter)
+      console.log(" 0 infenity");
+
+      return;
+    }
+    if (priceRange.value.min === 200 && priceRange.value.max === Infinity) {
+      this.fetchProducts(filter, { 'min': priceRange.value.min, 'max': 10000000 });
+      console.log(" 200 infenity");
+      return;
+    }
+
+    this.fetchProducts(filter, { 'min': priceRange.value.min, 'max': priceRange.value.max });
+
+  }
+
+
 
   onPriceRangeChange(event: any) {
     this.selectedPriceRange = event.value;
@@ -241,9 +261,7 @@ export class ProductListComponent implements OnInit {
     this.filterText = "";
     this.fetchProducts();
   }
-  filterProductsnotyet() {
 
-  }
 
 
 }
