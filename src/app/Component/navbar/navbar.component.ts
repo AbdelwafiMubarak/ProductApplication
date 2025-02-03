@@ -23,7 +23,7 @@ export class NavbarComponent implements OnInit {
   ngOnInit() {
     this.authService.isLoggedIn$.subscribe((loggedIn) => {
       this.isLoggedIn = loggedIn;
-      this.token = localStorage.getItem('authToken') || '';
+      // this.token = localStorage.getItem('authToken') || '';
       this.updateMenu();
     });
   }
@@ -33,7 +33,7 @@ export class NavbarComponent implements OnInit {
     this.leftMenuItems = [
       { label: 'Home', icon: 'pi pi-home', routerLink: [''] },
       { label: 'Products', icon: 'pi pi-box', routerLink: ['/productlist'] },
-      { label: 'Contact', icon: 'pi pi-envelope', routerLink: ['/contact'] }
+      // { label: 'Contact', icon: 'pi pi-envelope', routerLink: ['/contact'] }
     ];
 
     // Right Menu Items (Auth Section)

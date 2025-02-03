@@ -4,7 +4,7 @@
         <ng-template pTemplate="content">
             <form [formGroup]="productForm" (ngSubmit)="onSubmit()" enctype="multipart/form-data">
                 <div class="p-field">
-                    <label for="name">Product Name</label>
+                    <label for="name">Product Name <span class="required">*</span></label>
                     <input pInputText id="name" formControlName="name" placeholder="Enter product name" />
                     <small class="error-message"
                         *ngIf="productForm.get('name')?.invalid && productForm.get('name')?.touched">
@@ -13,7 +13,7 @@
                 </div>
 
                 <div class="p-field">
-                    <label for="description">Description</label>
+                    <label for="description">Description<span class="required">*</span></label>
                     <input pInputText id="description" formControlName="description"
                         placeholder="Enter product description" />
                     <small class="error-message"
@@ -24,22 +24,43 @@
 
 
                 <div class="p-field">
-                    <label for="price">price</label>
-                    <input pInputText id="price" formControlName="price" placeholder="Enter product price" />
+                    <label for="price">price<span class="required">*</span></label>
+                    <input pInputText id="price" formControlName="price" placeholder="Enter product price"
+                        type="number" />
                     <small class="error-message"
                         *ngIf="productForm.get('price')?.invalid && productForm.get('price')?.touched">
-                        price is required (Number).
+                        price is required
                     </small>
                 </div>
 
-                <div class="p-field">
+                <!-- <div class="p-field">
                     <label for="file">Product Image <span class="required">*</span></label>
                     <input type="file" id="file" (change)="onFileChange($event)" required />
                     <small class="error-message" *ngIf="fileError">
 
                         Please select an image file.
                     </small>
+                </div> -->
+                <div class="p-field">
+                    <label for="file">Product Image <span class="required">*</span></label>
+
+                    <p-fileUpload name="productImage" accept="image/*" maxFileSize="1000000"
+                        (onSelect)="onFileChange($event)" [auto]="true" [showUploadButton]="false"
+                        [showCancelButton]="true"></p-fileUpload>
+
+                    <small class="error-message" *ngIf="fileError">
+                        Please select a valid image file.
+                    </small>
                 </div>
+
+
+
+
+
+
+
+
+
 
                 <div class="button-group">
                     <button pButton label="Create Product" icon="pi pi-check" type="submit" class="p-button-success"

@@ -11,7 +11,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ToastrService } from 'ngx-toastr';
-
+import { FileUploadModule } from 'primeng/fileupload';
 @Component({
   selector: 'app-create-product',
   standalone: true,
@@ -23,7 +23,8 @@ import { ToastrService } from 'ngx-toastr';
     MatSnackBarModule,
     InputTextModule,
     ButtonModule,
-    CardModule
+    CardModule,
+    FileUploadModule
   ]
 })
 export class CreateProductComponent {
@@ -50,7 +51,10 @@ export class CreateProductComponent {
 
   // Handle file selection
   onFileChange(event: any) {
-    const file = event.target.files[0];
+    console.log("file selected");
+
+    //const file = event.target.files[0];
+    const file = event.files[0];
     if (file) {
       this.selectedFile = file;
       this.fileError = false; // Reset error if a file is selected

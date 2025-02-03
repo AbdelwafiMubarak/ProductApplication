@@ -104,3 +104,14 @@ input.p-inputtext:focus,
     max-width: 90% !important;
     z-index: 10000 !important;
 }
+
+
+
+.error small {
+    color: red;
+}
+
+.valid {
+    color: green;
+    font-weight: bold;
+}

@@ -5,7 +5,13 @@
         </ng-template>
 
         <ng-template pTemplate="content">
-            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" autocomplete="off">
+
+                <!-- ✅ Dummy hidden fields to trick browser -->
+                <input type="text" style="display: none;" autocomplete="username">
+                <input type="password" style="display: none;" autocomplete="new-password">
+
+
                 <!-- Email Field -->
                 <div class="p-field">
                     <label for="email">📧 Email</label>
@@ -21,7 +27,7 @@
                     <label for="password">🔑 Password</label>
                     <p-password [inputStyle]="{'width':'100%'}" [style]="{'width':'100%'}" id="password"
                         formControlName="password" [toggleMask]="true" [feedback]="false"
-                        placeholder="Enter your password" />
+                        placeholder="Enter your password" autocomplete="off" />
                     <small class="error-message"
                         *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
                         Password must be at least 6 characters

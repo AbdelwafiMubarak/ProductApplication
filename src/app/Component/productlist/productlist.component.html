@@ -10,7 +10,7 @@
 
 
 
-        <div class="p-inputgroup" style="margin-bottom: 1rem; width: 60%;">
+        <!-- <div class="p-inputgroup" style="margin-bottom: 1rem; width: 60%;">
             <input type="text" pInputText placeholder="Search by name..." [(ngModel)]="filterText" />
 
 
@@ -25,10 +25,21 @@
             <p-dropdown [options]="priceRanges" [(ngModel)]="selectedPriceRange" placeholder="Filter by Price"
                 optionLabel="label" [style]="{ width: '100%' }" (onChange)="filterProducts()">
             </p-dropdown>
+        </div> -->
+        <div class="p-inputgroup responsive-input-group">
+            <input type="text" pInputText placeholder="Search by name..." [(ngModel)]="filterText" />
+
+            <button pButton type="button" icon="pi pi-search" label="Search" (click)="filterProducts()"></button>
+            <button pButton type="button" icon="pi pi-refresh" class="p-button-secondary"
+                (click)="resetFilter()"></button>
+
+            <p-dropdown [options]="priceRanges" [(ngModel)]="selectedPriceRange" placeholder="Filter by Price"
+                [style]="{ width: '100%' }" optionLabel="label" (onChange)="filterProductsnotyet()">
+            </p-dropdown>
         </div>
 
 
-
+        <br>
 
 
 
@@ -67,7 +78,7 @@
 </p-card>
 
 <!-- ✅ Edit Product Dialog -->
-<p-dialog header="Edit Product" [(visible)]="displayEditDialog" [modal]="true" [closable]="true" [responsive]="true"
+<p-dialog header="Edit Product" [(visible)]="displayEditDialog" [modal]="true" [closable]="true" [responsive]="false"
     [style]="{width: '400px'}">
     <div class="p-fluid">
 
@@ -87,14 +98,23 @@
             <label for="price">price</label>
             <input type="number" pInputText id="price" [(ngModel)]="selectedProduct.price" />
         </div>
-        <div class="p-field">
+        <!-- <div class="p-field">
             <label for="file">Product Image</label>
             <input type="file" id="file" (change)="onFileChange($event)" />
             <small class="error-message" *ngIf="fileError">
                 Please select an image file.
             </small>
-        </div>
+        </div> -->
+        <div class="p-field">
+            <label for="file">Product Image <span class="required">*</span></label>
 
+            <p-fileUpload name="productImage" accept="image/*" maxFileSize="1000000" (onSelect)="onFileChange($event)"
+                [auto]="true" [showUploadButton]="false" [showCancelButton]="true"></p-fileUpload>
+
+            <small class="error-message" *ngIf="fileError">
+                Please select a valid image file.
+            </small>
+        </div>
 
 
     </div>

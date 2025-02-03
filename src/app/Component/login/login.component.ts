@@ -79,8 +79,8 @@ export class LoginComponent {
           //   this.logedin = loggedIn
           // });
           console.log(`befor loged in :this.logedin`);
-
-          this.authService.login();
+          this.authService.login(response.data.token);
+          //this.authService.login();
           this.authService.isLoggedIn$.subscribe((loggedIn) => {
             this.logedin = loggedIn
           });
@@ -98,7 +98,10 @@ export class LoginComponent {
       });
   }
 
+  ngOnInit() {
+    this.loginForm.reset();
 
+  }
 
   showMessage(message: string, type: 'success' | 'error') {
     if (type === 'success') {

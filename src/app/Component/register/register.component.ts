@@ -11,6 +11,7 @@ import { PasswordModule } from 'primeng/password';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ToastrService } from 'ngx-toastr';
+import { passwordStrengthValidator } from '../../Validators/Password_validator';
 @Component({
   selector: 'app-register',
   standalone: true,
@@ -41,12 +42,16 @@ export class RegisterComponent {
 
   ) {
     this.registerForm = this.fb.group({
-      firstName: ['', [Validators.required, Validators.minLength(3)]],
+      firstName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.required, Validators.minLength(6), passwordStrengthValidator()],],
     });
   }
+  get password() {
+    return this.registerForm.get('password');
+  }
   ngOnInit() {
+    this.registerForm.reset();
     // setTimeout(() => {
     //   this.snackBar.open('Snackbar Test', 'OK', { duration: 5000 });
     // }, 2000);

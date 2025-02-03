@@ -15,6 +15,8 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { DropdownModule } from 'primeng/dropdown';
+import { FileUpload, FileUploadModule } from 'primeng/fileupload';
+import { ViewChild } from '@angular/core';
 
 interface Product {
   id: number;
@@ -30,10 +32,11 @@ interface Product {
   standalone: true,
   templateUrl: './productlist.component.html',
   styleUrls: ['./productlist.component.css'],
-  imports: [CommonModule, TableModule, ButtonModule, CardModule, PanelModule, ConfirmDialogModule, FormsModule, DialogModule, InputTextModule, DropdownModule],
+  imports: [CommonModule, TableModule, ButtonModule, CardModule, PanelModule, ConfirmDialogModule, FormsModule, DialogModule, InputTextModule, DropdownModule, FileUploadModule,],
   providers: [ConfirmationService, MessageService,]
 })
 export class ProductListComponent implements OnInit {
+  @ViewChild('fileUpload', { static: false }) fileUpload: FileUpload | undefined;// 
   products: Product[] = [];
   loading: boolean = true;
   apiUrl = 'https://localhost:44394/api/Product/GetAllAsync'; // Replace with your API endpoint
@@ -51,6 +54,7 @@ export class ProductListComponent implements OnInit {
   // ✅ Variables for editing
   displayEditDialog: boolean = false;
   selectedProduct: Product = { id: 0, name: '', description: '', imageUrl: '', price: 0 };
+
   selectedFile: File | null = null;
   fileError = false;
   constructor(private http: HttpClient, private router: Router, private confirmationService: ConfirmationService, private toastr: ToastrService) { }
@@ -71,7 +75,7 @@ export class ProductListComponent implements OnInit {
     else {
       this.apiUrl = filter ?
         `https://localhost:44394/api/Product/SearchProductByName?name=${filter}`
-        : this.apiUrl = `https://localhost:44394/api/Product/GetAllAsync`;
+        : this.apiUrl = `https://localhost:44394/api/Product/GetAllOrderdIdAsending`;
     }
 
     this.http.get<Product[]>(this.apiUrl, { headers }).subscribe({
@@ -86,6 +90,9 @@ export class ProductListComponent implements OnInit {
         }
         this.products = response.data;
         this.loading = false;
+        if (this.fileUpload) {
+          this.fileUpload.clear();
+        }
 
       },
       error: (error) => {
@@ -99,12 +106,14 @@ export class ProductListComponent implements OnInit {
   editProduct(id: number) {
     // console.log(`Editing product ID: ${id}`);
     this.selectedProduct = this.products.find(p => p.id === id) || { id: 0, name: '', description: '', imageUrl: '', price: 0 };
+    var x = this.products.find(p => p.id === id) || { id: 0, name: '', description: '', imageUrl: '', price: 0 };
     this.displayEditDialog = true;
   }
 
   // Handle file selection
   onFileChange(event: any) {
-    const file = event.target.files[0];
+    // const file = event.target.files[0];
+    const file = event.files[0];
     if (file) {
       this.selectedFile = file;
       this.fileError = false; // Reset error if a file is selected
@@ -138,7 +147,11 @@ export class ProductListComponent implements OnInit {
         this.showMessage(response.message || 'Product updated successfully', 'success');
         // console.log('Product updated successfully.');
         this.selectedFile = null;
+        if (this.fileUpload) {
+          this.fileUpload.clear();
+        }
         this.displayEditDialog = false;
+
         this.fetchProducts(); // Refresh list
       },
       error: (error) => {
@@ -203,21 +216,21 @@ export class ProductListComponent implements OnInit {
 
   filterProducts() {
     const filter = this.filterText;
-    const priceRange = this.selectedPriceRange;
+    // const priceRange = this.selectedPriceRange;
 
-    // Check if priceRange is not null
-    if (priceRange) {
-      console.log("Selected price range:", priceRange);
-      console.log("Selected price max:", priceRange.max);
-      console.log("Selected price max:", priceRange.max);
+    // // Check if priceRange is not null
+    // if (priceRange) {
+    //   console.log("Selected price range:", priceRange);
+    //   console.log("Selected price max:", priceRange.max);
+    //   console.log("Selected price max:", priceRange.max);
 
-      console.log("Selected price range:", priceRange);
-      this.fetchProducts(filter, priceRange);
-    } else {
-      console.log("No price range selected.");
-      this.fetchProducts(filter); // Fetch products without any price range filter
-    }
+    // //   console.log("Selected price range:", priceRange);
+    //   this.fetchProducts(filter, undefined);
+    // } else {
+    //   console.log("No price range selected.");
+    this.fetchProducts(filter); // Fetch products without any price range filter
   }
+
   onPriceRangeChange(event: any) {
     this.selectedPriceRange = event.value;
     this.filterProducts();
@@ -228,7 +241,9 @@ export class ProductListComponent implements OnInit {
     this.filterText = "";
     this.fetchProducts();
   }
+  filterProductsnotyet() {
 
+  }
 
 
 }
