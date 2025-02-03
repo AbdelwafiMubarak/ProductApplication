@@ -77,3 +77,8 @@ input[type="file"]:hover {
 .error-message.ng-hide {
     display: none;
 }
+
+.required {
+    color: red;
+    font-weight: bold;
+}

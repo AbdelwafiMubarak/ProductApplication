@@ -5,12 +5,41 @@
         <button style="float: inline-end;" (click)="goToAddProduct()" pButton type="button" label="Add Product"
             icon="pi pi-plus" class="p-button-success"></button></ng-template>
     <ng-template pTemplate="content">
+
+
+
+
+
+        <div class="p-inputgroup" style="margin-bottom: 1rem; width: 60%;">
+            <input type="text" pInputText placeholder="Search by name..." [(ngModel)]="filterText" />
+
+
+
+
+
+
+            <button pButton type="button" icon="pi pi-search" label="Search" (click)="filterProducts()"></button>
+            <button pButton type="button" icon="pi pi-refresh" class="p-button-secondary"
+                (click)="resetFilter()"></button>
+
+            <p-dropdown [options]="priceRanges" [(ngModel)]="selectedPriceRange" placeholder="Filter by Price"
+                optionLabel="label" [style]="{ width: '100%' }" (onChange)="filterProducts()">
+            </p-dropdown>
+        </div>
+
+
+
+
+
+
+
         <p-table [value]="products" [paginator]="true" [rows]="4" [loading]="loading">
             <ng-template pTemplate="header">
                 <tr>
                     <th pSortableColumn="id">ID <p-sortIcon field="id"></p-sortIcon></th>
                     <th pSortableColumn="name">Name <p-sortIcon field="name"></p-sortIcon></th>
                     <th pSortableColumn="description">Description <p-sortIcon field="description"></p-sortIcon></th>
+                    <th pSortableColumn="description">price <p-sortIcon field="price"></p-sortIcon></th>
                     <th>Image</th>
 
                     <th>Actions</th>
@@ -22,6 +51,7 @@
                     <td>{{ product.id }}</td>
                     <td>{{ product.name }}</td>
                     <td>{{ product.description }}</td>
+                    <td>{{ product.price }}</td>
                     <td><img height="60" width="60" [src]="product.imageUrl" /></td>
 
                     <td>
@@ -52,6 +82,10 @@
         <div class="p-field">
             <label for="description">Description</label>
             <input pInputText id="description" [(ngModel)]="selectedProduct.description" />
+        </div>
+        <div class="p-field">
+            <label for="price">price</label>
+            <input type="number" pInputText id="price" [(ngModel)]="selectedProduct.price" />
         </div>
         <div class="p-field">
             <label for="file">Product Image</label>

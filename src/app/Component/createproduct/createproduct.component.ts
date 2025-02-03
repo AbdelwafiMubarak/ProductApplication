@@ -40,8 +40,11 @@ export class CreateProductComponent {
     private snackBar: MatSnackBar
   ) {
     this.productForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(3)]],
+      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
       description: ['', [Validators.required, Validators.minLength(5)]],
+      price: ['', [Validators.required, Validators.pattern('^[0-9]+(\\.[0-9]{1,2})?$')]],
+      // file: ['', [Validators.required]]
+
     });
   }
 
@@ -64,6 +67,7 @@ export class CreateProductComponent {
     const formData = new FormData();
     formData.append('name', this.productForm.get('name')?.value);
     formData.append('description', this.productForm.get('description')?.value);
+    formData.append('price', this.productForm.get('price')?.value);
     formData.append('file', this.selectedFile, this.selectedFile.name);
 
     const token = localStorage.getItem('authToken');

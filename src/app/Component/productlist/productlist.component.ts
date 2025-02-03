@@ -14,12 +14,14 @@ import { InputTextModule } from 'primeng/inputtext'; // ✅ Input Fields
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
+import { DropdownModule } from 'primeng/dropdown';
 
 interface Product {
   id: number;
   name: string;
   description: string;
   imageUrl: string;
+  price: number;
 
 }
 
@@ -28,16 +30,27 @@ interface Product {
   standalone: true,
   templateUrl: './productlist.component.html',
   styleUrls: ['./productlist.component.css'],
-  imports: [CommonModule, TableModule, ButtonModule, CardModule, PanelModule, ConfirmDialogModule, FormsModule, DialogModule, InputTextModule,],
+  imports: [CommonModule, TableModule, ButtonModule, CardModule, PanelModule, ConfirmDialogModule, FormsModule, DialogModule, InputTextModule, DropdownModule],
   providers: [ConfirmationService, MessageService,]
 })
 export class ProductListComponent implements OnInit {
   products: Product[] = [];
   loading: boolean = true;
   apiUrl = 'https://localhost:44394/api/Product/GetAllAsync'; // Replace with your API endpoint
+
+  priceRanges = [
+    { label: 'All', value: null },
+    { label: 'Below $50', value: { min: 0, max: 50 } },
+    { label: '$50 - $100', value: { min: 50, max: 100 } },
+    { label: '$100 - $200', value: { min: 100, max: 200 } },
+    { label: 'Above $200', value: { min: 200, max: Infinity } }
+  ];
+
+  selectedPriceRange: { min: number, max: number } | null = null;
+
   // ✅ Variables for editing
   displayEditDialog: boolean = false;
-  selectedProduct: Product = { id: 0, name: '', description: '', imageUrl: '' };
+  selectedProduct: Product = { id: 0, name: '', description: '', imageUrl: '', price: 0 };
   selectedFile: File | null = null;
   fileError = false;
   constructor(private http: HttpClient, private router: Router, private confirmationService: ConfirmationService, private toastr: ToastrService) { }
@@ -45,25 +58,35 @@ export class ProductListComponent implements OnInit {
   ngOnInit() {
     this.fetchProducts();
   }
-
-  fetchProducts() {
-    const token = localStorage.getItem('authToken'); // Get token from localStorage
-
-    console.log(token || null);
-    console.log("token");
-    // ✅ Add Authorization header if token exists
+  filterText: string = "";
+  fetchProducts(filter: string = "", priceRange: { min: number, max: number } | null = null) {
+    const token = localStorage.getItem('authToken');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    this.loading = true;
+    if (priceRange) {
+
+
+      this.apiUrl = `https://localhost:44394/api/Product/GetProductPriceFilter?min=${priceRange.min}&max=${priceRange.max}`;
+    }
+    else {
+      this.apiUrl = filter ?
+        `https://localhost:44394/api/Product/SearchProductByName?name=${filter}`
+        : this.apiUrl = `https://localhost:44394/api/Product/GetAllAsync`;
+    }
 
     this.http.get<Product[]>(this.apiUrl, { headers }).subscribe({
       next: (response: any) => {
         if (response.statusCode != 200) {
+
+
+          this.products = response.data;
+          this.loading = false;
           this.showMessage(response.message || 'Something went wrong', 'error');
           return
         }
-        console.log(response);
-
         this.products = response.data;
         this.loading = false;
+
       },
       error: (error) => {
         this.showMessage(error.message || 'Something went wrong', 'error');
@@ -74,8 +97,8 @@ export class ProductListComponent implements OnInit {
   }
 
   editProduct(id: number) {
-    console.log(`Editing product ID: ${id}`);
-    this.selectedProduct = this.products.find(p => p.id === id) || { id: 0, name: '', description: '', imageUrl: '' };
+    // console.log(`Editing product ID: ${id}`);
+    this.selectedProduct = this.products.find(p => p.id === id) || { id: 0, name: '', description: '', imageUrl: '', price: 0 };
     this.displayEditDialog = true;
   }
 
@@ -98,6 +121,7 @@ export class ProductListComponent implements OnInit {
     const form = new FormData();
     form.append('name', this.selectedProduct.name);
     form.append('description', this.selectedProduct.description);
+    form.append('price', this.selectedProduct.price.toString());
     // form.append('file', this.selectedFile!);
     if (this.selectedFile) {
       form.append('file', this.selectedFile);
@@ -112,7 +136,7 @@ export class ProductListComponent implements OnInit {
           return
         }
         this.showMessage(response.message || 'Product updated successfully', 'success');
-        console.log('Product updated successfully.');
+        // console.log('Product updated successfully.');
         this.selectedFile = null;
         this.displayEditDialog = false;
         this.fetchProducts(); // Refresh list
@@ -129,7 +153,7 @@ export class ProductListComponent implements OnInit {
 
 
   confirmDelete(id: number) {
-    console.log('confirm function.');
+    // console.log('confirm function.');
     this.confirmationService.confirm({
 
       message: 'Are you sure you want to delete this product?',
@@ -139,7 +163,7 @@ export class ProductListComponent implements OnInit {
         this.deleteProduct(id);
       },
       reject: () => {
-        console.log('Delete action cancelled.');
+        // console.log('Delete action cancelled.');
       }
     });
   }
@@ -147,8 +171,8 @@ export class ProductListComponent implements OnInit {
 
     const token = localStorage.getItem('authToken'); // Get token from localStorage
 
-    console.log(token || null);
-    console.log("token");
+    // console.log(token || null);
+    // console.log("token");
     // ✅ Add Authorization header if token exists
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     console.log(`Deleting product ID: ${id}`);
@@ -176,4 +200,35 @@ export class ProductListComponent implements OnInit {
       this.toastr.error(message, 'Error'); // ✅ Error Toast
     }
   }
+
+  filterProducts() {
+    const filter = this.filterText;
+    const priceRange = this.selectedPriceRange;
+
+    // Check if priceRange is not null
+    if (priceRange) {
+      console.log("Selected price range:", priceRange);
+      console.log("Selected price max:", priceRange.max);
+      console.log("Selected price max:", priceRange.max);
+
+      console.log("Selected price range:", priceRange);
+      this.fetchProducts(filter, priceRange);
+    } else {
+      console.log("No price range selected.");
+      this.fetchProducts(filter); // Fetch products without any price range filter
+    }
+  }
+  onPriceRangeChange(event: any) {
+    this.selectedPriceRange = event.value;
+    this.filterProducts();
+  }
+
+  // 🔄 Reset Filter
+  resetFilter() {
+    this.filterText = "";
+    this.fetchProducts();
+  }
+
+
+
 }
