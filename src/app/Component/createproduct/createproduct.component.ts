@@ -102,4 +102,10 @@ export class CreateProductComponent {
       this.toastr.error(message, 'Error'); // ✅ Error Toast
     }
   }
+  blockInvalidInput(event: KeyboardEvent) {
+    const invalidChars = ['e', 'E', '+', '-',];
+    if (invalidChars.includes(event.key)) {
+      event.preventDefault();
+    }
+  }
 }

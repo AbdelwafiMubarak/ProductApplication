@@ -17,6 +17,7 @@ import { ToastrService } from 'ngx-toastr';
 import { DropdownModule } from 'primeng/dropdown';
 import { FileUpload, FileUploadModule } from 'primeng/fileupload';
 import { ViewChild } from '@angular/core';
+import { JwtUtilService } from '../../services/JwtUtilService';
 
 interface Product {
   id: number;
@@ -24,6 +25,8 @@ interface Product {
   description: string;
   imageUrl: string;
   price: number;
+  createdBy: string;
+
 
 }
 
@@ -57,13 +60,18 @@ export class ProductListComponent implements OnInit {
 
   // ✅ Variables for editing
   displayEditDialog: boolean = false;
-  selectedProduct: Product = { id: 0, name: '', description: '', imageUrl: '', price: 0 };
+  selectedProduct: Product = { id: 0, name: '', description: '', imageUrl: '', price: 0, createdBy: '' };
 
   selectedFile: File | null = null;
   fileError = false;
-  constructor(private http: HttpClient, private router: Router, private confirmationService: ConfirmationService, private toastr: ToastrService) { }
+  currentUserEmail: string | null = null;
+  constructor(private http: HttpClient, private router: Router, private confirmationService: ConfirmationService, private toastr: ToastrService, private jwtUtil: JwtUtilService) { }
 
   ngOnInit() {
+    const tokenn = localStorage.getItem('authToken'); // Assuming the token is stored in localStorage
+    this.currentUserEmail = this.jwtUtil.getEmailFromToken(tokenn || '');
+    // console.log(this.currentUserEmail);
+
     this.fetchProducts();
   }
   filterText: string = "";
@@ -96,6 +104,8 @@ export class ProductListComponent implements OnInit {
           return
         }
         this.products = response.data;
+
+
         this.loading = false;
         if (this.fileUpload) {
           this.fileUpload.clear();
@@ -112,7 +122,7 @@ export class ProductListComponent implements OnInit {
 
   editProduct(id: number) {
     // console.log(`Editing product ID: ${id}`);
-    this.selectedProduct = this.products.find(p => p.id === id) || { id: 0, name: '', description: '', imageUrl: '', price: 0 };
+    this.selectedProduct = this.products.find(p => p.id === id) || { id: 0, name: '', description: '', imageUrl: '', price: 0, createdBy: '' };
     var x = this.products.find(p => p.id === id) || { id: 0, name: '', description: '', imageUrl: '', price: 0 };
     this.displayEditDialog = true;
   }
@@ -262,6 +272,11 @@ export class ProductListComponent implements OnInit {
     this.fetchProducts();
   }
 
-
+  blockInvalidInput(event: KeyboardEvent) {
+    const invalidChars = ['e', 'E', '+', '-',];
+    if (invalidChars.includes(event.key)) {
+      event.preventDefault();
+    }
+  }
 
 }

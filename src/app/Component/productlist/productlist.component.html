@@ -27,7 +27,8 @@
             </p-dropdown>
         </div> -->
         <div class="p-inputgroup responsive-input-group">
-            <input type="text" pInputText placeholder="Search by name..." [(ngModel)]="filterText" />
+            <input type="text" pInputText placeholder="Search by name..." [(ngModel)]="filterText"
+                (keydown.enter)="filterProducts()" />
 
             <button pButton type="button" icon="pi pi-search" label="Search" (click)="filterProducts()"></button>
             <button pButton type="button" icon="pi pi-refresh" class="p-button-secondary"
@@ -41,7 +42,7 @@
 
         <br>
 
-        filterProductsByPrice();
+
 
 
         <p-table [value]="products" [paginator]="true" [rows]="4" [loading]="loading">
@@ -49,8 +50,11 @@
                 <tr>
                     <th pSortableColumn="id">ID <p-sortIcon field="id"></p-sortIcon></th>
                     <th pSortableColumn="name">Name <p-sortIcon field="name"></p-sortIcon></th>
-                    <th pSortableColumn="description">Description <p-sortIcon field="description"></p-sortIcon></th>
-                    <th pSortableColumn="description">price <p-sortIcon field="price"></p-sortIcon></th>
+                    <!-- <th pSortableColumn="description">Description <p-sortIcon field="description"></p-sortIcon></th> -->
+                    <th> Owner </th>
+                    <th> Description </th>
+                    <!-- <th pSortableColumn="description">price <p-sortIcon field="price"></p-sortIcon></th> -->
+                    <th> price </th>
                     <th>Image</th>
 
                     <th>Actions</th>
@@ -61,6 +65,7 @@
                 <tr>
                     <td>{{ product.id }}</td>
                     <td>{{ product.name }}</td>
+                    <td>{{ product.createdBy }}</td>
                     <td>{{ product.description }}</td>
                     <!-- <td>{{ product.price }}</td> -->
                     <td>{{ product.price | currency: 'USD':'symbol':'1.2-2' }}</td>
@@ -69,9 +74,12 @@
 
                     <td>
                         <button pButton label="Edit" icon="pi pi-pencil" class="p-button-sm p-button-info"
-                            (click)="editProduct(product.id)"></button>
+                            (click)="editProduct(product.id)" [disabled]="currentUserEmail !== product.createdBy">
+
+                        </button>
                         <button pButton label="Delete" icon="pi pi-trash" class="p-button-sm p-button-danger ml-2"
-                            (click)="confirmDelete(product.id)"></button>
+                            (click)="confirmDelete(product.id)"
+                            [disabled]="currentUserEmail !== product.createdBy"></button>
                     </td>
                 </tr>
             </ng-template>
@@ -98,7 +106,8 @@
         </div>
         <div class="p-field">
             <label for="price">price</label>
-            <input type="number" pInputText id="price" [(ngModel)]="selectedProduct.price" />
+            <input type="number" pInputText id="price" [(ngModel)]="selectedProduct.price" inputmode="decimal"
+                (keydown)="blockInvalidInput($event)" />
         </div>
         <!-- <div class="p-field">
             <label for="file">Product Image</label>
