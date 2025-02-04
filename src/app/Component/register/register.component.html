@@ -31,31 +31,6 @@
                         Valid email is required
                     </small>
                 </div>
-
-                <!-- Password Field
-                <div class="p-field">
-                    <label for="password">🔑 Password</label>
-                    <p-password [inputStyle]="{'width':'100%'}" [style]="{'width':'100%'}" id="password"
-                        formControlName="password" toggleMask [feedback]="false" placeholder="Enter your password" />
-                    <small class="error-message"
-                        *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
-                        Password must be at least 6 characters
-
-                        <small *ngIf="password?.errors['passwordStrength']">
-                            Password must contain:
-                            <ul>
-                                <li [class.valid]="password?.errors['passwordStrength'].hasUpperCase">An uppercase letter
-                                </li>
-                                <li [class.valid]="password?.errors['passwordStrength'].hasLowerCase">A lowercase letter
-                                </li>
-                                <li [class.valid]="password?.errors['passwordStrength'].hasNumber">A number</li>
-                                <li [class.valid]="password?.errors['passwordStrength'].hasSpecialChar">A special
-                                    character
-                                </li>
-                            </ul>
-                        </small> </small>
-
-                </div> -->
                 <!-- ✅ Dummy hidden fields to trick browser -->
                 <input type="text" style="display: none;" autocomplete="username">
                 <input type="password" style="display: none;" autocomplete="new-password">
@@ -67,7 +42,6 @@
                         formControlName="password" toggleMask [feedback]="false" placeholder="Enter your password"
                         autocomplete="off">
                     </p-password>
-
                     <small class="error-message" *ngIf="password?.invalid && password?.touched">
                         Password must be at least 6 characters.
 

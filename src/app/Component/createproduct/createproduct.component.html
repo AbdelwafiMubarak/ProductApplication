@@ -8,8 +8,8 @@
                     <input pInputText id="name" formControlName="name" placeholder="Enter product name"
                         pattern=".*[A-Za-z].*" />
                     <small class="error-message"
-                        *ngIf="productForm.get('name')?.invalid && productForm.get('name')?.touched">
-                        Product name is required (Min: 3 characters).
+                        *ngIf="productForm.get('name')?.invalid && productForm.get('name')?.touched || productForm.get('name')?.hasError('pattern')  ">
+                        Product name must contain at least one letter (Min Length:3)
                     </small>
                 </div>
 
