@@ -83,7 +83,7 @@ export class ProductListComponent implements OnInit {
     this.loading = true;
     if (priceRange != null) {
 
-      console.log("filter price passed to the fetch");
+      //console.log("filter price passed to the fetch");
 
       this.apiUrl = `https://localhost:44394/api/Product/GetProductPriceFilter?min=${priceRange.min}&max=${priceRange.max}`;
     }
@@ -122,8 +122,13 @@ export class ProductListComponent implements OnInit {
 
   editProduct(id: number) {
     // console.log(`Editing product ID: ${id}`);
-    this.selectedProduct = this.products.find(p => p.id === id) || { id: 0, name: '', description: '', imageUrl: '', price: 0, createdBy: '' };
-    var x = this.products.find(p => p.id === id) || { id: 0, name: '', description: '', imageUrl: '', price: 0 };
+    // this.selectedProduct = this.products.find(p => p.id === id) || { id: 0, name: '', description: '', imageUrl: '', price: 0, createdBy: '' };
+    // var x = this.products.find(p => p.id === id) || { id: 0, name: '', description: '', imageUrl: '', price: 0 };
+    // this.displayEditDialog = true;
+    const productToEdit = this.products.find(p => p.id === id);
+    if (productToEdit) {
+      this.selectedProduct = structuredClone(productToEdit); // ✅ Deep copy
+    }
     this.displayEditDialog = true;
   }
 
@@ -163,6 +168,16 @@ export class ProductListComponent implements OnInit {
         }
         this.showMessage(response.message || 'Product updated successfully', 'success');
         // console.log('Product updated successfully.');
+
+        const index = this.products.findIndex(p => p.id === this.selectedProduct.id);
+        if (index !== -1) {
+          this.products[index] = structuredClone(this.selectedProduct);
+        }
+
+
+
+
+
         this.selectedFile = null;
         if (this.fileUpload) {
           this.fileUpload.clear();
@@ -232,7 +247,7 @@ export class ProductListComponent implements OnInit {
   }
 
   filterProducts() {
-    console.log("filterProducts");
+    // console.log("filterProducts");
     const filter = this.filterText;
     this.fetchProducts(filter);
   }
@@ -243,15 +258,16 @@ export class ProductListComponent implements OnInit {
     const priceRange: any = this.selectedPriceRange;
 
     if (priceRange.value.min === 0 && priceRange.value.max === Infinity) {
-      this.fetchProducts(filter, { 'min': 0, 'max': 10000000 });
+      // this.fetchProducts(filter, { 'min': 0, 'max': 10000000 });
       //this.fetchProducts(filter)
-      console.log(" 0 infenity");
+      this.resetFilter();
+      // console.log(" 0 infenity");
 
       return;
     }
     if (priceRange.value.min === 200 && priceRange.value.max === Infinity) {
       this.fetchProducts(filter, { 'min': priceRange.value.min, 'max': 10000000 });
-      console.log(" 200 infenity");
+      // console.log(" 200 infenity");
       return;
     }
 

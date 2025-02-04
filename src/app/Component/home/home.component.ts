@@ -13,8 +13,8 @@ export class HomeComponent {
   constructor(private router: Router) { }
 
   navigateTo(path: string) {
-    console.log("navigate to");
-    console.log(path);
+    //console.log("navigate to");
+    //console.log(path);
 
     //this.router.navigate([path]);
     this.router.navigateByUrl(`/${path}`);

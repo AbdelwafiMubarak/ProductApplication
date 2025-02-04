@@ -5,7 +5,8 @@
             <form [formGroup]="productForm" (ngSubmit)="onSubmit()" enctype="multipart/form-data">
                 <div class="p-field">
                     <label for="name">Product Name <span class="required">*</span></label>
-                    <input pInputText id="name" formControlName="name" placeholder="Enter product name" />
+                    <input pInputText id="name" formControlName="name" placeholder="Enter product name"
+                        pattern=".*[A-Za-z].*" />
                     <small class="error-message"
                         *ngIf="productForm.get('name')?.invalid && productForm.get('name')?.touched">
                         Product name is required (Min: 3 characters).

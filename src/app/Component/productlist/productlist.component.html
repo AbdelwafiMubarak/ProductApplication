@@ -28,9 +28,10 @@
         </div> -->
         <div class="p-inputgroup responsive-input-group">
             <input type="text" pInputText placeholder="Search by name..." [(ngModel)]="filterText"
-                (keydown.enter)="filterProducts()" />
+                (keydown.enter)="filterProducts()" [style.width]="'30%'" />
 
-            <button pButton type="button" icon="pi pi-search" label="Search" (click)="filterProducts()"></button>
+            <button pButton type="button" icon="pi pi-search" label="Search" (click)="filterProducts()"
+                [style.width]="'5%'"></button>
             <button pButton type="button" icon="pi pi-refresh" class="p-button-secondary"
                 (click)="resetFilter()"></button>
 
@@ -98,11 +99,12 @@
 
         <div class="p-field">
             <label for="name">Product Name</label>
-            <input pInputText id="name" [(ngModel)]="selectedProduct.name" />
+            <input pInputText id="name" [(ngModel)]="selectedProduct.name" minlength="3" required
+                pattern=".*[A-Za-z].*" />
         </div>
         <div class="p-field">
             <label for="description">Description</label>
-            <input pInputText id="description" [(ngModel)]="selectedProduct.description" />
+            <input pInputText id="description" [(ngModel)]="selectedProduct.description" minlength="5" required />
         </div>
         <div class="p-field">
             <label for="price">price</label>
@@ -117,7 +119,7 @@
             </small>
         </div> -->
         <div class="p-field">
-            <label for="file">Product Image <span class="required">*</span></label>
+            <label for="file">Product Image </label>
 
             <p-fileUpload #fileUpload name="productImage" accept="image/*" maxFileSize="1000000"
                 (onSelect)="onFileChange($event)" [auto]="true" [showUploadButton]="false"
@@ -134,6 +136,6 @@
         <button pButton label="Save" icon="pi pi-check" class="p-button-sm p-button-success"
             (click)="saveProduct()"></button>
         <button pButton label="Cancel" icon="pi pi-times" class="p-button-sm p-button-secondary"
-            (click)="displayEditDialog=false"></button>
+            (click)="displayEditDialog=false;resetFilter()"></button>
     </ng-template>
 </p-dialog>
