@@ -96,3 +96,7 @@ input[type="file"]:hover {
         /* ✅ Full-width inputs/buttons on mobile */
     }
 }
+
+p-dialog {
+    transition: opacity 0.3s ease-in-out;
+}

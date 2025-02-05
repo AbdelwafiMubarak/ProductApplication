@@ -59,6 +59,8 @@
                     <th>Image</th>
 
                     <th>Actions</th>
+
+                    <th>Download</th>
                 </tr>
             </ng-template>
 
@@ -71,9 +73,12 @@
                     <!-- <td>{{ product.price }}</td> -->
                     <td>{{ product.price | currency: 'USD':'symbol':'1.2-2' }}</td>
 
-                    <td><img height="60" width="60" [src]="product.imageUrl" /></td>
+                    <td><img height="60" width="60" [src]="product.imageUrl"
+                            (mouseenter)="showImagePopup(product.imageUrl)" (mouseleave)="hideImagePopup()"
+                            style="cursor: pointer;" /></td>
 
                     <td>
+
                         <button pButton label="Edit" icon="pi pi-pencil" class="p-button-sm p-button-info"
                             (click)="editProduct(product.id)" [disabled]="currentUserEmail !== product.createdBy">
 
@@ -82,11 +87,27 @@
                             (click)="confirmDelete(product.id)"
                             [disabled]="currentUserEmail !== product.createdBy"></button>
                     </td>
+
+                    <td> <button pButton label="Download" (click)="downloadSelectedProducts(product.id)"
+                            icon="pi pi-download" class="p-button-sm p-button-info"
+                            [disabled]="currentUserEmail !== product.createdBy"></button></td>
                 </tr>
             </ng-template>
         </p-table>
     </ng-template>
 </p-card>
+
+
+
+<p-dialog [(visible)]="displayImagePopup" [modal]="false" [dismissableMask]="true" [style]="{width: 'auto'}"
+    [draggable]="false" [resizable]="false" [baseZIndex]="10000" [closable]="false" position="top">
+    <img [src]="popupImageUrl" style="max-width: 600px; max-height: 600px;" />
+</p-dialog>
+
+
+
+
+
 
 <!-- ✅ Edit Product Dialog -->
 <p-dialog header="Edit Product" [(visible)]="displayEditDialog" [modal]="true" [closable]="true" [responsive]="false"

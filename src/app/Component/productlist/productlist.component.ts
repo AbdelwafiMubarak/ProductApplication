@@ -18,7 +18,8 @@ import { DropdownModule } from 'primeng/dropdown';
 import { FileUpload, FileUploadModule } from 'primeng/fileupload';
 import { ViewChild } from '@angular/core';
 import { JwtUtilService } from '../../services/JwtUtilService';
-
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 interface Product {
   id: number;
   name: string;
@@ -44,6 +45,8 @@ export class ProductListComponent implements OnInit {
   loading: boolean = true;
   apiUrl = 'https://localhost:44394/api/Product/GetAllAsync'; // Replace with your API endpoint
 
+  displayImagePopup: boolean = false;
+  popupImageUrl: string = '';
   priceRanges = [
     { label: 'All', value: { min: 0, max: Infinity } },
     { label: 'Below $50', value: { min: 0, max: 50 } },
@@ -294,5 +297,151 @@ export class ProductListComponent implements OnInit {
       event.preventDefault();
     }
   }
+
+
+
+  showImagePopup(imageUrl: string) {
+    this.popupImageUrl = imageUrl;
+    this.displayImagePopup = true;
+  }
+
+  hideImagePopup() {
+    this.displayImagePopup = false;
+  }
+
+
+  // downloadSelectedProducts(id: number) {
+  //   const selectedProducttodownload = this.products.find(p => p.id === id);
+  //   if (!selectedProducttodownload) {
+  //     // this.messageService.add({ severity: 'warn', summary: 'No Products Selected', detail: 'Please select at least one product.' });
+  //     return;
+  //   }
+
+  //   const doc = new jsPDF();
+
+  //   // Title
+  //   doc.setFontSize(16);
+  //   doc.text('Selected Product Details', 14, 15);
+
+  //   // Prepare table headers
+  //   const headers = [['ID', 'Name', 'Description', 'Price']];
+
+
+
+  //   const data = [[
+  //     selectedProducttodownload.id,
+  //     selectedProducttodownload.name,
+  //     selectedProducttodownload.description,
+  //     selectedProducttodownload.price,
+
+  //   ]];
+  //   if (selectedProducttodownload.imageUrl) {
+  //     // console.log(selectedProducttodownload.imageUrl);
+
+  //     const img = new Image();
+  //     img.src = selectedProducttodownload.imageUrl; // Image URL or Base64 data
+
+  //     img.onload = () => {
+
+  //       const extension = selectedProducttodownload.imageUrl.split('.').pop()?.toUpperCase();
+  //       const supportedFormats = ['JPEG', 'JPG', 'PNG', 'WEBP'];
+
+  //       // Default to 'JPEG' if the format is unsupported
+  //       const format = supportedFormats.includes(extension!) ? extension! : 'JPEG';
+
+
+  //       // Add the image to the PDF (x, y, width, height)
+
+
+
+
+  //       autoTable(doc, {
+  //         startY: 80, // Position after the title
+  //         head: headers,
+  //         body: data,
+  //         theme: 'striped', // Optional: adds striped rows for better readability
+  //         styles: {
+  //           fontSize: 10,
+  //           cellPadding: 3,
+  //         },
+  //         headStyles: {
+  //           fillColor: [41, 128, 185], // Custom header color
+  //           textColor: 255,
+  //           fontStyle: 'bold',
+  //         },
+  //       });
+  //       doc.addImage(img, format, 14, 25, 100, 50);
+  //       // Save the PDF
+  //       doc.save(`${selectedProducttodownload.name}.pdf`);
+  //     }
+  //   }
+  // }
+
+  downloadSelectedProducts(id: number) {
+    const selectedProducttodownload = this.products.find(p => p.id === id);
+    if (!selectedProducttodownload) {
+      return;
+    }
+
+    const doc = new jsPDF();
+
+    // Title
+    doc.setFontSize(16);
+    doc.text('Selected Product Details', 14, 15);
+
+    // Prepare table headers
+    const headers = [['ID', 'Name', 'Description', 'Price']];
+    const data = [[
+      selectedProducttodownload.id,
+      selectedProducttodownload.name,
+      selectedProducttodownload.description,
+      selectedProducttodownload.price,
+    ]];
+
+    const addImageAfterTable = (finalY: number) => {
+      if (selectedProducttodownload.imageUrl) {
+        const img = new Image();
+        img.src = selectedProducttodownload.imageUrl; // Image URL or Base64 data
+
+        img.onload = () => {
+          const extension = selectedProducttodownload.imageUrl.split('.').pop()?.toUpperCase();
+          const supportedFormats = ['JPEG', 'JPG', 'PNG', 'WEBP'];
+
+          // Default to 'JPEG' if the format is unsupported
+          const format = supportedFormats.includes(extension!) ? extension! : 'JPEG';
+
+          // Add the image after the table
+          const imageYPosition = finalY + 10; // Add 10 units of padding after the table
+          doc.addImage(img, format, 14, imageYPosition, 100, 50);
+
+          // Save the PDF after image is added
+          doc.save(`${selectedProducttodownload.name}.pdf`);
+        };
+      }
+    };
+
+    // Draw the table
+    const table = autoTable(doc, {
+      startY: 25, // Position after the title
+      head: headers,
+      body: data,
+      theme: 'striped',
+      styles: {
+        fontSize: 10,
+        cellPadding: 3,
+      },
+      headStyles: {
+        fillColor: [41, 128, 185],
+        textColor: 255,
+        fontStyle: 'bold',
+      },
+      didDrawPage: (data) => {
+        // After the table is drawn, add the image
+        const finalY = data.cursor ? data.cursor.y : 80;// Get the Y position where the table ends
+        addImageAfterTable(finalY);
+      }
+    });
+  }
+
 
 }
