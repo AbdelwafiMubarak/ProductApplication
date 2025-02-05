@@ -13,7 +13,9 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ToastrService } from 'ngx-toastr';
 import { environment } from '../../../environments/environment';
-
+import { MessagesModule } from 'primeng/messages';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -28,21 +30,25 @@ import { environment } from '../../../environments/environment';
     PasswordModule,
     ButtonModule,
     CardModule,
-
-  ]
+    MessagesModule,
+    MessagesModule,
+    ToastModule
+  ], providers: [MessageService]
 })
 export class LoginComponent {
   private environment = environment;
   loginForm: FormGroup;
   apiUrl = 'https://localhost:44394/api/Account/Token';
   logedin = false;
+  messages: { severity: string; summary: string; detail: string }[] = [];
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
     private router: Router,
     private snackBar: MatSnackBar,
     private authService: AuthService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private messageService: MessageService
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -103,11 +109,48 @@ export class LoginComponent {
 
   }
 
+  // showMessage(message: string, type: 'success' | 'error') {
+  //   if (type === 'success') {
+  //     this.toastr.success(message, 'Success'); // ✅ Success Toast
+  //   } else {
+  //     this.toastr.error(message, 'Error'); // ✅ Error Toast
+  //   }
+  // }
+
+  // showMessage(message: string, type: 'success' | 'error') {
+
+  //   console.log("ssss");
+  //   console.log(message);
+  //   console.log(type);
+
+  //   this.messages = [
+  //     {
+  //       severity: type,
+  //       summary: type === 'success' ? 'Success' : 'Error',
+  //       detail: message
+  //     }
+  //   ];
+
+  //   // Clear the message after 3 seconds
+  //   setTimeout(() => {
+  //     this.messages = [];
+  //   }, 3000);
+  // }
+
+
   showMessage(message: string, type: 'success' | 'error') {
-    if (type === 'success') {
-      this.toastr.success(message, 'Success'); // ✅ Success Toast
-    } else {
-      this.toastr.error(message, 'Error'); // ✅ Error Toast
-    }
+    this.messageService.add({
+      severity: type,
+      summary: type === 'success' ? 'Success' : 'Error',
+      detail: message,
+      life: 3000,// Auto-hide after 3 seconds
+      sticky: true,
+      closable: true
+    });
   }
+
+
+
+
+
 }

@@ -12,6 +12,10 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ToastrService } from 'ngx-toastr';
 import { passwordStrengthValidator } from '../../Validators/Password_validator';
+import { MessagesModule } from 'primeng/messages';
+import { MessageService } from 'primeng/api';
+import { ToastModule } from 'primeng/toast';
+
 @Component({
   selector: 'app-register',
   standalone: true,
@@ -26,20 +30,23 @@ import { passwordStrengthValidator } from '../../Validators/Password_validator';
     PasswordModule,
     ButtonModule,
     CardModule,
-
+    MessagesModule,
+    MessagesModule,
+    ToastModule
   ], encapsulation: ViewEncapsulation.None,
+  providers: [MessageService]
 })
 export class RegisterComponent {
   registerForm: FormGroup;
   apiUrl = 'https://localhost:44394/api/Account/Register';
-
+  messages: { severity: string; summary: string; detail: string }[] = [];
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
     private router: Router,
     private snackBar: MatSnackBar,
-    private toastr: ToastrService
-
+    private toastr: ToastrService,
+    private messageService: MessageService
   ) {
     this.registerForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
@@ -89,24 +96,26 @@ export class RegisterComponent {
       });
   }
 
+
+
   // showMessage(message: string, type: 'success' | 'error') {
-  //   this.snackBar.open(message, 'OK', {
-  //     duration: 5000,
-  //     panelClass: type === 'success' ? 'success-snackbar' : 'error-snackbar',
-  //     horizontalPosition: 'right',
-  //     verticalPosition: 'top',
-  //   });
+  //   if (type === 'success') {
+  //     this.toastr.success(message, 'Success'); // ✅ Success Toast
+  //   } else {
+  //     this.toastr.error(message, 'Error'); // ✅ Error Toast
+  //   }
   // }
 
   showMessage(message: string, type: 'success' | 'error') {
-    if (type === 'success') {
-      this.toastr.success(message, 'Success'); // ✅ Success Toast
-    } else {
-      this.toastr.error(message, 'Error'); // ✅ Error Toast
-    }
+    this.messageService.add({
+      severity: type,
+      summary: type === 'success' ? 'Success' : 'Error',
+      detail: message,
+      life: 3000,// Auto-hide after 3 seconds
+      sticky: true,
+      closable: true
+    });
   }
-
-
 
 
 

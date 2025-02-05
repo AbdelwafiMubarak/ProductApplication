@@ -101,7 +101,7 @@
 
 <p-dialog [(visible)]="displayImagePopup" [modal]="false" [dismissableMask]="true" [style]="{width: 'auto'}"
     [draggable]="false" [resizable]="false" [baseZIndex]="10000" [closable]="false" position="top">
-    <img [src]="popupImageUrl" style="max-width: 600px; max-height: 600px;" />
+    <img [src]="popupImageUrl" style="max-width: 600px; max-height: 600px;" style="height: 250px; width: 200px;" />
 </p-dialog>
 
 
@@ -115,7 +115,7 @@
     <div class="p-fluid">
 
         <div class="p-field">
-            <img [src]="selectedProduct.imageUrl" />
+            <img [src]="selectedProduct.imageUrl" style="height: 400px; width: 300px;" />
         </div><br>
 
         <div class="p-field">
