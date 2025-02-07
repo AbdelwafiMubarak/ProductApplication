@@ -14,10 +14,7 @@ export class AuthService {
         const token = localStorage.getItem('authToken');
         this.loggedIn.next(!!token); // ✅ Set true if token exist
     }
-    // login() {
-    //     this.loggedIn.next(true);  // ✅ Set logged in
-    //     //this.UserNmae.next(user??"");
-    // }
+
     login(token: string) {
         localStorage.setItem('authToken', token);
         this.loggedIn.next(true);

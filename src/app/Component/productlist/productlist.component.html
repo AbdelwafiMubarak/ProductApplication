@@ -155,7 +155,6 @@
 <p-dialog header="Edit Product" [(visible)]="displayEditDialog" [modal]="true" [closable]="true" [responsive]="false"
     [style]="{width: '400px'}" (onHide)=resetDialog()>
     <div class="p-fluid">
-
         <div class="p-field">
             <img [src]="selectedProduct.imageUrl" style="height: 400px; width: 300px;" />
         </div><br>
@@ -195,7 +194,6 @@
         <!-- </small> -->
         <!-- </div>  -->
 
-
         <div class="p-field">
             <label for="file">Product Image <span class="required">*</span><span class="supported">(only jpg and
                     png images are supported)</span></label>
@@ -208,20 +206,6 @@
                 Please select a valid image file.
             </small> -->
         </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     </div>
     <ng-template pTemplate="footer">
