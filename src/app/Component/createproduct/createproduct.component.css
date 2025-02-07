@@ -82,3 +82,8 @@ input[type="file"]:hover {
     color: red;
     font-weight: bold;
 }
+
+.supported {
+    color: rgb(236, 204, 20);
+    font-weight: normal;
+}

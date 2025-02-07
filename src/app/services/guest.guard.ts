@@ -11,9 +11,7 @@ export class GuestGuard implements CanActivate {
 
   canActivate(): boolean {
     const token = localStorage.getItem('authToken');
-    // console.log('GuestGuard: Token found?', token);
-    // console.log("token");
-    // console.log(token);
+
     if (token) {
       console.log('GuestGuard: User is logged in, redirecting...');
       //  this.router.navigate(['']); // Redirect logged-in users

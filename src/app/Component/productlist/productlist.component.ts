@@ -67,12 +67,18 @@ export class ProductListComponent implements OnInit {
 
   selectedFile: File | null = null;
   fileError = false;
+  fileErrorMessage: string = '';
   currentUserEmail: string | null = null;
-  constructor(private http: HttpClient, private router: Router, private confirmationService: ConfirmationService, private toastr: ToastrService, private jwtUtil: JwtUtilService) { }
+  constructor(private http: HttpClient, private router: Router, private confirmationService: ConfirmationService,
+    private toastr: ToastrService, private jwtUtil: JwtUtilService, private messageService: MessageService) { }
 
   ngOnInit() {
     const tokenn = localStorage.getItem('authToken'); // Assuming the token is stored in localStorage
-    this.currentUserEmail = this.jwtUtil.getEmailFromToken(tokenn || '');
+    // this.currentUserEmail = this.jwtUtil.getEmailFromToken(tokenn || '');
+    // console.log(this.currentUserEmail);
+    // console.log("this.currentUserEmail");
+
+    this.currentUserEmail = localStorage.getItem('user') ?? null;
     // console.log(this.currentUserEmail);
 
     this.fetchProducts();
@@ -88,7 +94,7 @@ export class ProductListComponent implements OnInit {
 
       //console.log("filter price passed to the fetch");
 
-      this.apiUrl = `https://localhost:44394/api/Product/GetProductPriceFilter?min=${priceRange.min}&max=${priceRange.max}`;
+      this.apiUrl = `https://localhost:44394/api/Product/GetProductFilteredAsync?min=${priceRange.min}&max=${priceRange.max}&name=${filter}`;
     }
     else {
       this.apiUrl = filter ?
@@ -129,19 +135,28 @@ export class ProductListComponent implements OnInit {
     // var x = this.products.find(p => p.id === id) || { id: 0, name: '', description: '', imageUrl: '', price: 0 };
     // this.displayEditDialog = true;
     const productToEdit = this.products.find(p => p.id === id);
+
     if (productToEdit) {
       this.selectedProduct = structuredClone(productToEdit); // ✅ Deep copy
     }
+    setTimeout(() => {
+      if (this.fileUpload) {
+        this.fileUpload.clear(); // Ensure file upload is cleared
+      }
+    });
+    setTimeout(() => {
+      if (this.selectedFile) {
+        this.selectedFile = null // Ensure file upload is cleared
+      }
+    });
     this.displayEditDialog = true;
   }
 
   // Handle file selection
-  onFileChange(event: any) {
-    // const file = event.target.files[0];
-    const file = event.files[0];
-    if (file) {
-      this.selectedFile = file;
-      this.fileError = false; // Reset error if a file is selected
+  resetDialog() {
+    this.selectedFile = null // Clear product data
+    if (this.fileUpload) {
+      this.fileUpload.clear(); // Reset file upload component
     }
   }
 
@@ -252,30 +267,53 @@ export class ProductListComponent implements OnInit {
   filterProducts() {
     // console.log("filterProducts");
     const filter = this.filterText;
-    this.fetchProducts(filter);
+    //this.fetchProducts(filter);
+    const priceRange: any = this.selectedPriceRange;
+    this.fetchProducts(filter, { 'min': priceRange.value.min, 'max': 10000000 });
   }
 
 
   filterProductsByPrice() {
     const filter = this.filterText;
     const priceRange: any = this.selectedPriceRange;
+    console.log("start filterProductsByPrice");
+    if (priceRange) {
+      if (priceRange.value.min === 0 && priceRange.value.max === Infinity) {
+        // this.fetchProducts(filter, { 'min': 0, 'max': 10000000 });
+        //this.fetchProducts(filter)
+        this.fetchProducts(filter, { 'min': priceRange.value.min, 'max': 0 });
 
-    if (priceRange.value.min === 0 && priceRange.value.max === Infinity) {
-      // this.fetchProducts(filter, { 'min': 0, 'max': 10000000 });
-      //this.fetchProducts(filter)
-      this.resetFilter();
-      // console.log(" 0 infenity");
+        //this.resetFilter();
+        // console.log(" 0 infenity");
 
-      return;
+        return;
+      }
+
+      if (priceRange.value.min === 0 && priceRange.value.max === 50) {
+        // this.fetchProducts(filter, { 'min': 0, 'max': 10000000 });
+        //this.fetchProducts(filter)
+        this.fetchProducts(filter, { 'min': priceRange.value.min, 'max': priceRange.value.max });
+
+        //this.resetFilter();
+        // console.log(" 0 infenity");
+
+        return;
+      }
+
+
+      if (priceRange.value.min === 200 && priceRange.value.max === Infinity) {
+        this.fetchProducts(filter, { 'min': priceRange.value.min, 'max': 10000000 });
+        // console.log(" 200 infenity");
+        return;
+      }
+      if (priceRange.value.min && priceRange.value.max) {
+        // console.log("start filv");
+        this.fetchProducts(filter, { 'min': priceRange.value.min, 'max': priceRange.value.max });
+        return;
+      }
     }
-    if (priceRange.value.min === 200 && priceRange.value.max === Infinity) {
-      this.fetchProducts(filter, { 'min': priceRange.value.min, 'max': 10000000 });
-      // console.log(" 200 infenity");
-      return;
-    }
-
-    this.fetchProducts(filter, { 'min': priceRange.value.min, 'max': priceRange.value.max });
-
+    this.fetchProducts(filter);
+    console.log(" last");
   }
 
 
@@ -418,6 +456,8 @@ export class ProductListComponent implements OnInit {
           doc.save(`${selectedProducttodownload.name}.pdf`);
         };
       }
+      console.log("dowload file end");
+
     };
 
     // Draw the table
@@ -442,6 +482,44 @@ export class ProductListComponent implements OnInit {
       }
     });
   }
+  // onFileChange(event: any) {
+  //   // const file = event.target.files[0];
+  //   const file = event.files[0];
+  //   if (file) {
+  //     this.selectedFile = file;
+  //     this.fileError = false; // Reset error if a file is selected
+  //   }
+  // }
+
+
+
+
+
+  onFileChange(event: any) {
+    this.fileErrorMessage = ''; // Reset error message
+    const file = event.files[0];
+    this.fileError = false
+    if (file && file.size > 3145728) { // 3MB size check
+      this.fileError = true
+      this.fileErrorMessage = 'Maximum upload size is 3 MB.';
+      return
+    }
+    this.selectedFile = file;
+    this.fileError = false
+  }
+
+  handleFileError(event: any) {
+    this.fileError = true
+    this.fileErrorMessage = '  Ensure it is a valid image and within the size limit.';
+  }
+  reseterr() {
+    this.fileError = false
+    this.selectedFile = null;
+  }
+
 
 
 }
+
+
+

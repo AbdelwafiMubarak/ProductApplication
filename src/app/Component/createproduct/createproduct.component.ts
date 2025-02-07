@@ -32,7 +32,7 @@ export class CreateProductComponent {
   selectedFile: File | null = null;
   fileError = false;
   apiUrl = 'https://localhost:44394/api/Product/AddProductAsync';
-
+  fileErrorMessage: string = '';
   constructor(
     private fb: FormBuilder,
     private http: HttpClient,
@@ -49,17 +49,7 @@ export class CreateProductComponent {
     });
   }
 
-  // Handle file selection
-  onFileChange(event: any) {
-    console.log("file selected");
 
-    //const file = event.target.files[0];
-    const file = event.files[0];
-    if (file) {
-      this.selectedFile = file;
-      this.fileError = false; // Reset error if a file is selected
-    }
-  }
 
   onSubmit() {
     if (this.productForm.invalid || !this.selectedFile) {
@@ -108,4 +98,24 @@ export class CreateProductComponent {
       event.preventDefault();
     }
   }
+
+
+  onFileChange(event: any) {
+    this.fileErrorMessage = ''; // Reset error message
+    const file = event.files[0];
+
+    if (file && file.size > 3145728) { // 3MB size check
+      this.fileErrorMessage = 'Maximum upload size is 3 MB.';
+      return
+    }
+    this.selectedFile = file;
+  }
+
+  handleFileError(event: any) {
+    this.fileErrorMessage = 'Error uploading file. Ensure it is a valid image and within the size limit.';
+  }
+
+
+
+
 }

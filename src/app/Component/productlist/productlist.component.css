@@ -52,7 +52,16 @@ input[type="file"]:hover {
     display: none;
 }
 
+.m {
+    color: #f0ed5ee7;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
 
+.supported {
+    color: rgb(236, 204, 20);
+    font-weight: normal;
+}
 
 .responsive-input-group {
     display: flex;
@@ -99,4 +108,27 @@ input[type="file"]:hover {
 
 p-dialog {
     transition: opacity 0.3s ease-in-out;
+}
+
+
+
+
+
+
+
+
+.title-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.title-container button {
+    white-space: nowrap;
+    align-items: center;
+    text-align: left;
+    margin: right 5px;
+    ;
+    /* Prevents button text from wrapping */
 }

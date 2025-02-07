@@ -22,10 +22,10 @@ import { ToastModule } from 'primeng/toast';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
   imports: [
-    CommonModule,          // Required for *ngIf and other directives
-    ReactiveFormsModule,   // Required for formGroup
-    HttpClientModule,      // Required for API calls
-    MatSnackBarModule,     // Material Snackbar Module
+    CommonModule,
+    ReactiveFormsModule,
+    HttpClientModule,
+    MatSnackBarModule,
     InputTextModule,
     PasswordModule,
     ButtonModule,
@@ -79,20 +79,17 @@ export class LoginComponent {
             return
           }
           localStorage.setItem('authToken', response.data.token);
-          let user: string = response.data.token
+
+          localStorage.setItem('user', response.data.userId);
+          let user: string = response.data.token;
           this.showMessage(response.message || 'Login successful!', 'success');
-          // this.authService.isLoggedIn$.subscribe((loggedIn) => {
-          //   this.logedin = loggedIn
-          // });
-          console.log(`befor loged in :this.logedin`);
+
           this.authService.login(response.data.token);
-          //this.authService.login();
+
           this.authService.isLoggedIn$.subscribe((loggedIn) => {
             this.logedin = loggedIn
           });
-          console.log(`after loged in :this.logedin`);
 
-          console.log(this.logedin);
           this.router.navigateByUrl('/');
           this.loginForm.reset();
         },
@@ -109,35 +106,6 @@ export class LoginComponent {
 
   }
 
-  // showMessage(message: string, type: 'success' | 'error') {
-  //   if (type === 'success') {
-  //     this.toastr.success(message, 'Success'); // ✅ Success Toast
-  //   } else {
-  //     this.toastr.error(message, 'Error'); // ✅ Error Toast
-  //   }
-  // }
-
-  // showMessage(message: string, type: 'success' | 'error') {
-
-  //   console.log("ssss");
-  //   console.log(message);
-  //   console.log(type);
-
-  //   this.messages = [
-  //     {
-  //       severity: type,
-  //       summary: type === 'success' ? 'Success' : 'Error',
-  //       detail: message
-  //     }
-  //   ];
-
-  //   // Clear the message after 3 seconds
-  //   setTimeout(() => {
-  //     this.messages = [];
-  //   }, 3000);
-  // }
-
-
   showMessage(message: string, type: 'success' | 'error') {
     this.messageService.add({
       severity: type,
@@ -148,8 +116,6 @@ export class LoginComponent {
       closable: true
     });
   }
-
-
 
 
 

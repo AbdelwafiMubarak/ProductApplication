@@ -1,10 +1,46 @@
 <p-confirmDialog></p-confirmDialog>
 
 <p-card>
-    <ng-template pTemplate="title">Product Management
+    <!-- <ng-template pTemplate="title">Product Management
         <button style="float: inline-end;" (click)="goToAddProduct()" pButton type="button" label="Add Product"
-            icon="pi pi-plus" class="p-button-success"></button></ng-template>
+            icon="pi pi-plus" class="p-button-success"></button></ng-template> -->
+
+
+
+
+
+    <ng-template pTemplate="title">
+        <div class="title-container">
+            <span>Product board</span>
+
+
+            <button (click)="goToAddProduct()" pButton type="button" label="Add product " icon="pi pi-plus"
+                class="p-button-success"></button>
+
+        </div>
+    </ng-template>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <ng-template pTemplate="content">
+
+
+
 
 
 
@@ -27,10 +63,13 @@
             </p-dropdown>
         </div> -->
         <div class="p-inputgroup responsive-input-group">
-            <input type="text" pInputText placeholder="Search by name..." [(ngModel)]="filterText"
-                (keydown.enter)="filterProducts()" [style.width]="'30%'" />
 
-            <button pButton type="button" icon="pi pi-search" label="Search" (click)="filterProducts()"
+
+
+            <input type="text" pInputText placeholder="Search by name..." [(ngModel)]="filterText"
+                (keydown.enter)="filterProductsByPrice()" [style.width]="'30%'" />
+
+            <button pButton type="button" icon="pi pi-search" label="Search" (click)="filterProductsByPrice()"
                 [style.width]="'5%'"></button>
             <button pButton type="button" icon="pi pi-refresh" class="p-button-secondary"
                 (click)="resetFilter()"></button>
@@ -38,6 +77,9 @@
             <p-dropdown [options]="priceRanges" [(ngModel)]="selectedPriceRange" placeholder="Filter by Price"
                 [style]="{ width: '100%' }" optionLabel="label" (onChange)="filterProductsByPrice()">
             </p-dropdown>
+
+
+
         </div>
 
 
@@ -111,7 +153,7 @@
 
 <!-- ✅ Edit Product Dialog -->
 <p-dialog header="Edit Product" [(visible)]="displayEditDialog" [modal]="true" [closable]="true" [responsive]="false"
-    [style]="{width: '400px'}">
+    [style]="{width: '400px'}" (onHide)=resetDialog()>
     <div class="p-fluid">
 
         <div class="p-field">
@@ -139,23 +181,52 @@
                 Please select an image file.
             </small>
         </div> -->
-        <div class="p-field">
-            <label for="file">Product Image </label>
+        <!-- <div class="p-field">
+            <label for="file">Product Image <span class="supported">(only jpg and png images are supported)</span>
+            </label>
 
-            <p-fileUpload #fileUpload name="productImage" accept="image/*" maxFileSize="1000000"
+            <p-fileUpload #fileUpload name="productImage" accept=".jpg,.jpeg,.png" maxFileSize="3145728"
                 (onSelect)="onFileChange($event)" [auto]="true" [showUploadButton]="false"
-                [showCancelButton]="true"></p-fileUpload>
+                (onError)="handleFileError($event)" [showCancelButton]="true">
+            </p-fileUpload>
 
             <small class="error-message" *ngIf="fileError">
+                Please select a valid image file. -->
+        <!-- </small> -->
+        <!-- </div>  -->
+
+
+        <div class="p-field">
+            <label for="file">Product Image <span class="required">*</span><span class="supported">(only jpg and
+                    png images are supported)</span></label>
+
+            <p-fileUpload name="productImage" accept=".jpg,.jpeg,.png" maxFileSize="3145728"
+                (onSelect)="onFileChange($event)" [auto]="true" [showUploadButton]="false"
+                (onError)="handleFileError($event)" [showCancelButton]="true"></p-fileUpload>
+
+            <!-- <small class="error-message" *ngIf="fileError">
                 Please select a valid image file.
-            </small>
+            </small> -->
         </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     </div>
     <ng-template pTemplate="footer">
         <button pButton label="Save" icon="pi pi-check" class="p-button-sm p-button-success"
-            (click)="saveProduct()"></button>
+            (click)=" saveProduct()"></button>
         <button pButton label="Cancel" icon="pi pi-times" class="p-button-sm p-button-secondary"
             (click)="displayEditDialog=false;resetFilter()"></button>
     </ng-template>

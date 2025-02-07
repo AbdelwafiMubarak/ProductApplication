@@ -34,33 +34,19 @@
                     </small>
                 </div>
 
-                <!-- <div class="p-field">
-                    <label for="file">Product Image <span class="required">*</span></label>
-                    <input type="file" id="file" (change)="onFileChange($event)" required />
-                    <small class="error-message" *ngIf="fileError">
 
-                        Please select an image file.
-                    </small>
-                </div> -->
                 <div class="p-field">
-                    <label for="file">Product Image <span class="required">*</span></label>
+                    <label for="file">Product Image <span class="required">*</span><span class="supported">(only jpg and
+                            png images are supported)</span></label>
 
-                    <p-fileUpload name="productImage" accept="image/*" maxFileSize="10000"
+                    <p-fileUpload name="productImage" accept=".jpg,.jpeg,.png" maxFileSize="3145728"
                         (onSelect)="onFileChange($event)" [auto]="true" [showUploadButton]="false"
-                        [showCancelButton]="true"></p-fileUpload>
+                        (onError)="handleFileError($event)" [showCancelButton]="true"></p-fileUpload>
 
                     <small class="error-message" *ngIf="fileError">
                         Please select a valid image file.
                     </small>
                 </div>
-
-
-
-
-
-
-
-
 
 
                 <div class="button-group">

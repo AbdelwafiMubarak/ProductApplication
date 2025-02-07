@@ -59,15 +59,13 @@ export class RegisterComponent {
   }
   ngOnInit() {
     this.registerForm.reset();
-    // setTimeout(() => {
-    //   this.snackBar.open('Snackbar Test', 'OK', { duration: 5000 });
-    // }, 2000);
+
   }
 
   onSubmit() {
     console.log("sumitting:");
     const formData = new FormData();
-    formData.append("FirstName", this.registerForm.value.name);  // 👈 Make sure field names match API
+    formData.append("FirstName", this.registerForm.value.firstName);  // 👈 Make sure field names match API
     formData.append("email", this.registerForm.value.email);
     formData.append("password", this.registerForm.value.password);
 
@@ -85,7 +83,7 @@ export class RegisterComponent {
             return
           }
 
-          this.showMessage(response.message, 'success');
+          this.showMesssage(response.message, 'success');
           this.router.navigateByUrl('/login');
           this.registerForm.reset();
         }, // Clear form after success}
@@ -98,13 +96,13 @@ export class RegisterComponent {
 
 
 
-  // showMessage(message: string, type: 'success' | 'error') {
-  //   if (type === 'success') {
-  //     this.toastr.success(message, 'Success'); // ✅ Success Toast
-  //   } else {
-  //     this.toastr.error(message, 'Error'); // ✅ Error Toast
-  //   }
-  // }
+  showMesssage(message: string, type: 'success' | 'error') {
+    if (type === 'success') {
+      this.toastr.success(message, 'Success'); // ✅ Success Toast
+    } else {
+      this.toastr.error(message, 'Error'); // ✅ Error Toast
+    }
+  }
 
   showMessage(message: string, type: 'success' | 'error') {
     this.messageService.add({
@@ -116,8 +114,6 @@ export class RegisterComponent {
       closable: true
     });
   }
-
-
 
 }
 
