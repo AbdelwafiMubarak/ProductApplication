@@ -173,26 +173,7 @@
             <input type="number" pInputText id="price" [(ngModel)]="selectedProduct.price" inputmode="decimal"
                 (keydown)="blockInvalidInput($event)" />
         </div>
-        <!-- <div class="p-field">
-            <label for="file">Product Image</label>
-            <input type="file" id="file" (change)="onFileChange($event)" />
-            <small class="error-message" *ngIf="fileError">
-                Please select an image file.
-            </small>
-        </div> -->
-        <!-- <div class="p-field">
-            <label for="file">Product Image <span class="supported">(only jpg and png images are supported)</span>
-            </label>
 
-            <p-fileUpload #fileUpload name="productImage" accept=".jpg,.jpeg,.png" maxFileSize="3145728"
-                (onSelect)="onFileChange($event)" [auto]="true" [showUploadButton]="false"
-                (onError)="handleFileError($event)" [showCancelButton]="true">
-            </p-fileUpload>
-
-            <small class="error-message" *ngIf="fileError">
-                Please select a valid image file. -->
-        <!-- </small> -->
-        <!-- </div>  -->
 
         <div class="p-field">
             <label for="file">Product Image <span class="required">*</span><span class="supported">(only jpg and

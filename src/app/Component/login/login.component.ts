@@ -16,6 +16,8 @@ import { environment } from '../../../environments/environment';
 import { MessagesModule } from 'primeng/messages';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { DialogModule } from 'primeng/dialog';
+import { passwordStrengthValidator } from '../../Validators/Password_validator';
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -23,6 +25,7 @@ import { ToastModule } from 'primeng/toast';
   styleUrls: ['./login.component.css'],
   imports: [
     CommonModule,
+    DialogModule,
     ReactiveFormsModule,
     HttpClientModule,
     MatSnackBarModule,
@@ -36,10 +39,18 @@ import { ToastModule } from 'primeng/toast';
   ], providers: [MessageService]
 })
 export class LoginComponent {
+
   private environment = environment;
   loginForm: FormGroup;
-  apiUrl = 'https://localhost:44394/api/Account/Token';
+  resetForm: FormGroup;
+  UpdatetForm: FormGroup;
+  Email: string = "";
+  apiUrlLogin = 'https://localhost:44394/api/Account/Token';
+  apiUrlsetPassword = 'https://localhost:44394/api/Account/SetPassword';
+  apiUrlForrgotPassword = 'https://localhost:44394/api/Account/ForgetPassword';
   logedin = false;
+  displayResetDialog: boolean = false;
+  updatepasswordDialog: boolean = false;
   messages: { severity: string; summary: string; detail: string }[] = [];
   constructor(
     private fb: FormBuilder,
@@ -54,6 +65,23 @@ export class LoginComponent {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)],],
     });
+    this.resetForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]]
+    });
+    this.UpdatetForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6), passwordStrengthValidator()],],
+      otp: ['', [Validators.required, Validators.minLength(6)],],
+
+    });
+
+  }
+  ngOnInit() {
+    this.loginForm.reset();
+    this.resetForm.reset();
+    this.UpdatetForm.reset();
+
+
   }
   // Validators.pattern('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{6,}$')
   onSubmit() {
@@ -66,12 +94,12 @@ export class LoginComponent {
     formData.append('email', this.loginForm.value.email);
     formData.append('password', this.loginForm.value.password);
 
-    this.http.post(this.apiUrl, formData)
+    this.http.post(this.apiUrlLogin, formData)
       .subscribe({
 
 
         next: (response: any) => {
-          console.log(this.apiUrl);
+          //  console.log(this.apiUrl);
           // console.log(this.environment.Account.);
 
           if (response.statusCode != 201) {
@@ -101,22 +129,123 @@ export class LoginComponent {
       });
   }
 
-  ngOnInit() {
-    this.loginForm.reset();
+
+  openResetDialog() {
+    this.resetForm.reset(); // Clear previous input
+    this.displayResetDialog = true;
+  }
+
+
+  onForgotPassword() {
+    if (this.resetForm.invalid) return;
+    const formData = new FormData();
+    formData.append('Email', this.resetForm.value.email);
+
+
+    this.http.post(this.apiUrlForrgotPassword, formData)
+      .subscribe({
+
+
+        next: (response: any) => {
+          // console.error('response:', response);
+
+          if (response.statusCode != 200) {
+            this.showMessage(response.message || 'Something went wrong', 'error');
+            return
+          }
+
+
+
+          this.showMessage(response.message || 'Login successful!', 'success');
+
+          // console.log("befor route");
+
+
+          this.loginForm.reset();
+          this.resetForm.reset();
+          this.UpdatetForm.reset();
+          this.displayResetDialog = false
+          this.updatepasswordDialog = true
+
+        },
+        error: (error) => {
+          console.error('Login Error:', error);
+          const errorMsg = error.error?.message || 'Something went wrong. Please try again.';
+          this.showMessage(errorMsg, 'error');
+        },
+      });
+
 
   }
 
+
+  onSetPassword() {
+    if (this.UpdatetForm.invalid) return;
+    const formData = new FormData();
+    formData.append('email', this.UpdatetForm.value.email);
+    formData.append('opt', this.UpdatetForm.value.otp);
+    formData.append('password', this.UpdatetForm.value.password);
+
+
+
+    this.http.put(this.apiUrlsetPassword, formData)
+      .subscribe({
+
+
+        next: (response: any) => {
+          // console.error('response:', response);
+
+          if (response.statusCode != 200) {
+            this.showMessage(response.message || 'Something went wrong', 'error');
+            return
+          }
+
+
+
+          this.showMessage(response.message || 'Login successful!', 'success');
+
+          // console.log("befor route");
+          this.loginForm.reset();
+          this.resetForm.reset();
+          this.UpdatetForm.reset();
+          this.displayResetDialog = false
+          this.updatepasswordDialog = false
+          this.router.navigateByUrl('/login');
+
+        },
+        error: (error) => {
+          console.error('Login Error:', error);
+          const errorMsg = error.error?.message || 'Something went wrong. Please try again.';
+          this.showMessage(errorMsg, 'error');
+        },
+      });
+  }
+
+
+
+
   showMessage(message: string, type: 'success' | 'error') {
+    if (type === "success") {
+      this.messageService.add({
+        severity: type,
+        summary: type === 'success' ? 'Success' : 'Error',
+        detail: message,
+        life: 3000,// Auto-hide after 3 seconds
+        sticky: false,
+        closable: false
+      });
+      return
+    }
+
     this.messageService.add({
       severity: type,
-      summary: type === 'success' ? 'Success' : 'Error',
+      summary: 'Error',
       detail: message,
       life: 3000,// Auto-hide after 3 seconds
       sticky: true,
       closable: true
     });
   }
-
 
 
 }

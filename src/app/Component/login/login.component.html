@@ -41,7 +41,111 @@
                     <p-button label="Login" icon="pi pi-sign-in" type="submit"
                         [disabled]="loginForm.invalid"></p-button>
                 </div>
+
+                <br>
+                <div class="forgot-password">
+                    <a (click)="openResetDialog()">Forgot Password?</a>
+                </div>
             </form>
         </ng-template>
     </p-card>
 </div>
+
+
+<!-- <p-dialog header="Reset Password" [(visible)]="displayEditDialog" [modal]="true" [closable]="true" [responsive]="false"
+
+    [style]="{width: '400px'}" (onHide)=resetDialog()>
+
+
+
+    <div class="p-field">
+        <label for="resetemail">📧 Email</label>
+        <input pInputText id="resetemail" type="email" placeholder="Enter your email" [(ngModel)]="Email">
+        <small class="error-message">
+            Valid email is required
+        </small>
+    </div>
+
+
+
+
+    <ng-template pTemplate="footer">
+        <div class="button-group">
+            <p-button label="Reset" icon="pi pi-sign-in" [disabled]="ResetForm.invalid"
+                (onClick)=" resetDialog()"></p-button>
+        </div>
+
+
+
+    </ng-template>
+</p-dialog> -->
+<!-- Reset Password Dialog -->
+<p-dialog header=" Forget Password" [(visible)]="displayResetDialog" [modal]="true" [closable]="true"
+    [responsive]="false" [style]="{width: '400px'}">
+
+    <form [formGroup]="resetForm">
+        <div class="p-field">
+            <label for="resetemail">📧 Email</label>
+            <input pInputText id="resetemail" type="email" formControlName="email" placeholder="Enter your email">
+            <small class="error-message" *ngIf="resetForm.get('email')?.invalid && resetForm.get('email')?.touched">
+                Valid email is required
+            </small>
+        </div>
+    </form>
+    <ng-template pTemplate="footer">
+        <div class="button-group">
+            <p-button label="Reset" icon="pi pi-envelope" [disabled]="resetForm.invalid"
+                (click)="onForgotPassword()"></p-button>
+        </div>
+    </ng-template>
+
+</p-dialog>
+
+
+
+
+
+
+<p-dialog header="Reset Password" [(visible)]="updatepasswordDialog" [modal]="true" [closable]="true"
+    [responsive]="false" [style]="{width: '400px'}">
+
+    <form [formGroup]="UpdatetForm">
+        <!-- ✅ Dummy hidden fields to trick browser -->
+        <input type="text" style="display: none;" autocomplete="username">
+        <input type="password" style="display: none;" autocomplete="new-password">
+        <div class="p-field">
+            <label for="resetemail">📧 Email</label>
+            <input pInputText id="updatetemail" type="email" formControlName="email" placeholder="Enter your email">
+            <small class="error-message" *ngIf="UpdatetForm.get('email')?.invalid && UpdatetForm.get('email')?.touched">
+                Valid email is required
+            </small>
+        </div>
+
+        <div class="p-field">
+            <label for="resetemail">🔑 New Password</label>
+            <input pInputText id="password" type="password" formControlName="password" placeholder="Enter New Password">
+            <small class="error-message"
+                *ngIf="UpdatetForm.get('password')?.invalid && UpdatetForm.get('password')?.touched">
+                Valid Password is required
+            </small>
+        </div>
+
+
+        <div class="p-field">
+            <label for="resetemail">OTP</label>
+            <input pInputText id="otp" type="number" formControlName="otp" placeholder="Enter the OTP">
+            <small class="error-message" *ngIf="UpdatetForm.get('otp')?.invalid && UpdatetForm.get('otp')?.touched">
+                Valid email is required
+            </small>
+
+        </div>
+
+    </form>
+    <ng-template pTemplate="footer">
+        <div class="button-group">
+            <p-button label="Reset" icon="pi pi-envelope" [disabled]="UpdatetForm.invalid"
+                (click)="onSetPassword()"></p-button>
+        </div>
+    </ng-template>
+
+</p-dialog>
