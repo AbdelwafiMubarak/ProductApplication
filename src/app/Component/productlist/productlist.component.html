@@ -175,7 +175,7 @@
         </div>
 
 
-        <div class="p-field">
+        <!-- <div class="p-field">
             <label for="file">Product Image <span class="required">*</span><span class="supported">(only jpg and
                     png images are supported)</span></label>
 
@@ -183,10 +183,33 @@
                 (onSelect)="onFileChange($event)" [auto]="true" [showUploadButton]="false"
                 (onError)="handleFileError($event)" [showCancelButton]="true"></p-fileUpload>
 
-            <!-- <small class="error-message" *ngIf="fileError">
+            <small class="error-message" *ngIf="fileError">
                 Please select a valid image file.
             </small> -->
+        <!-- </div>  -->
+
+        <div class="p-field">
+            <label for="file">Product Image <span class="required">*</span>
+                <span class="supported">(only jpg and png images are supported, Max: 3MB)</span>
+            </label>
+
+            <p-fileUpload name="productImage" accept=".jpg,.jpeg,.png" [customUpload]="true"
+                (onSelect)="onFileChange($event)" [showUploadButton]="false" [showCancelButton]="true"
+                [invalidFileSizeMessageSummary]="'Maximum upload size is 3 MB  '"
+                [invalidFileTypeMessageSummary]="'Only JPG and PNG images are allowed '"
+                [invalidFileTypeMessageDetail]="''">
+                >
+            </p-fileUpload>
+
+            <!-- <small class="error-message" *ngIf="fileErrorMessage">
+                {{ fileErrorMessage }}
+            </small> -->
         </div>
+
+
+
+
+
 
     </div>
     <ng-template pTemplate="footer">

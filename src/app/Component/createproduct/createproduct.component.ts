@@ -100,22 +100,50 @@ export class CreateProductComponent {
   }
 
 
+  // onFileChange(event: any) {
+  //   this.fileErrorMessage = ''; // Reset error message
+  //   const file = event.files[0];
+
+  //   if (file && file.size > 3145728) { // 3MB size check
+  //     this.fileErrorMessage = 'Maximum upload size is 3 MB.';
+  //     return
+  //   }
+  //   this.selectedFile = file;
+  // }
+
+  // handleFileError(event: any) {
+  //   this.fileErrorMessage = 'Error uploading file. Ensure it is a valid image and within the size limit.';
+  // }
+
   onFileChange(event: any) {
     this.fileErrorMessage = ''; // Reset error message
     const file = event.files[0];
 
-    if (file && file.size > 3145728) { // 3MB size check
-      this.fileErrorMessage = 'Maximum upload size is 3 MB.';
-      return
+    // Check if a file is selected
+    if (!file) {
+      this.fileErrorMessage = 'Please select a file.';
+      return;
     }
-    this.selectedFile = file;
+
+    // Validate file size (3MB limit)
+    if (file.size > 3145728) {
+      this.fileErrorMessage = 'Maximum upload size is 3MB.';
+      return;
+    }
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png'];
+    if (!allowedTypes.includes(file.type)) {
+      this.fileErrorMessage = 'Only JPG and PNG images are allowed.';
+      return;
+    }
+
+    this.selectedFile = file; // Store valid file
   }
 
   handleFileError(event: any) {
     this.fileErrorMessage = 'Error uploading file. Ensure it is a valid image and within the size limit.';
   }
-
-
 
 
 }
