@@ -135,7 +135,10 @@ export class ProductListComponent implements OnInit {
     // var x = this.products.find(p => p.id === id) || { id: 0, name: '', description: '', imageUrl: '', price: 0 };
     // this.displayEditDialog = true;
     const productToEdit = this.products.find(p => p.id === id);
-
+    this.selectedFile = null;
+    if (this.fileUpload) {
+      this.fileUpload.clear();  // This will clear the file input and remove any file preview
+    }
     if (productToEdit) {
       this.selectedProduct = structuredClone(productToEdit); // ✅ Deep copy
     }
@@ -195,7 +198,7 @@ export class ProductListComponent implements OnInit {
 
 
 
-
+        this.selectedProduct = { id: 0, name: '', description: '', imageUrl: '', price: 0, createdBy: '' };
         this.selectedFile = null;
         if (this.fileUpload) {
           this.fileUpload.clear();
@@ -238,7 +241,7 @@ export class ProductListComponent implements OnInit {
     // console.log("token");
     // ✅ Add Authorization header if token exists
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    console.log(`Deleting product ID: ${id}`);
+    // console.log(`Deleting product ID: ${id}`);
     this.http.delete(`https://localhost:44394/api/Product/DeleteProductAsync?Id=${id}`, { headers }).subscribe({
       next: (response: any) => {
         if (response.statusCode != 200) {
@@ -276,7 +279,7 @@ export class ProductListComponent implements OnInit {
   filterProductsByPrice() {
     const filter = this.filterText;
     const priceRange: any = this.selectedPriceRange;
-    console.log("start filterProductsByPrice");
+    // console.log("start filterProductsByPrice");
     if (priceRange) {
       if (priceRange.value.min === 0 && priceRange.value.max === Infinity) {
         // this.fetchProducts(filter, { 'min': 0, 'max': 10000000 });
@@ -292,7 +295,7 @@ export class ProductListComponent implements OnInit {
       if (priceRange.value.min === 0 && priceRange.value.max === 50) {
         // this.fetchProducts(filter, { 'min': 0, 'max': 10000000 });
         //this.fetchProducts(filter)
-        this.fetchProducts(filter, { 'min': priceRange.value.min, 'max': priceRange.value.max });
+        this.fetchProducts(filter, { 'min': priceRange.value.min, 'max': priceRange.value.max - 1 });
 
         //this.resetFilter();
         // console.log(" 0 infenity");
@@ -313,7 +316,7 @@ export class ProductListComponent implements OnInit {
       }
     }
     this.fetchProducts(filter);
-    console.log(" last");
+    // console.log(" last");
   }
 
 
@@ -456,7 +459,7 @@ export class ProductListComponent implements OnInit {
           doc.save(`${selectedProducttodownload.name}.pdf`);
         };
       }
-      console.log("dowload file end");
+      // console.log("dowload file end");
 
     };
 
@@ -554,6 +557,7 @@ export class ProductListComponent implements OnInit {
   reseterr() {
     this.fileError = false
     this.selectedFile = null;
+
   }
 
 

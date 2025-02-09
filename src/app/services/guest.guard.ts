@@ -18,7 +18,7 @@ export class GuestGuard implements CanActivate {
       return false;
     }
 
-    console.log('GuestGuard: User is NOT logged in, allowing access.');
+    // console.log('GuestGuard: User is NOT logged in, allowing access.');
     return true;
   }
 }

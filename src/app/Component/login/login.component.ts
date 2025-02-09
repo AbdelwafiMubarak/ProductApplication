@@ -17,7 +17,7 @@ import { MessagesModule } from 'primeng/messages';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { DialogModule } from 'primeng/dialog';
-import { passwordStrengthValidator } from '../../Validators/Password_validator';
+import { matchPasswords, passwordStrengthValidator } from '../../Validators/Password_validator';
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -71,9 +71,15 @@ export class LoginComponent {
     this.UpdatetForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6), passwordStrengthValidator()],],
+      // confirmpassword: ['', [Validators.required, Validators.minLength(6), passwordStrengthValidator()],],
+      confirmpassword: ['', [Validators.required]],
       otp: ['', [Validators.required, Validators.minLength(6)],],
+    },
 
-    });
+      {
+        validator: matchPasswords('password', 'confirmpassword')
+      }
+    );
 
   }
   ngOnInit() {

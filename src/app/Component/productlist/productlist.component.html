@@ -25,24 +25,7 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
     <ng-template pTemplate="content">
-
-
-
-
-
 
 
 
@@ -135,7 +118,14 @@
                             [disabled]="currentUserEmail !== product.createdBy"></button></td>
                 </tr>
             </ng-template>
+            <ng-template pTemplate="footer">
+                <tr>
+                    <td colspan="8" class="text-right"><strong>Total Products : {{products.length }}</strong></td>
+                </tr>
+            </ng-template>
+            <h2>hhf</h2>
         </p-table>
+
     </ng-template>
 </p-card>
 
@@ -216,6 +206,6 @@
         <button pButton label="Save" icon="pi pi-check" class="p-button-sm p-button-success"
             (click)=" saveProduct()"></button>
         <button pButton label="Cancel" icon="pi pi-times" class="p-button-sm p-button-secondary"
-            (click)="displayEditDialog=false;resetFilter()"></button>
+            (click)="displayEditDialog=false;reseterr()"></button>
     </ng-template>
 </p-dialog>

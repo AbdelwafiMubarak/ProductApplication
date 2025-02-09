@@ -1,4 +1,4 @@
-import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { AbstractControl, FormGroup, ValidationErrors, ValidatorFn } from '@angular/forms';
 
 // ✅ Custom Password Validator
 export function passwordStrengthValidator(): ValidatorFn {
@@ -28,5 +28,23 @@ export function passwordStrengthValidator(): ValidatorFn {
                     isValidLength,
                 },
             };
+    };
+}
+
+
+export function matchPasswords(passwordKey: string, confirmPasswordKey: string) {
+    return (formGroup: FormGroup) => {
+        const password = formGroup.get(passwordKey);
+        const confirmPassword = formGroup.get(confirmPasswordKey);
+
+        if (confirmPassword?.errors && !confirmPassword.errors['passwordMismatch']) {
+            return;
+        }
+
+        if (password?.value !== confirmPassword?.value) {
+            confirmPassword?.setErrors({ passwordMismatch: true });
+        } else {
+            confirmPassword?.setErrors(null);
+        }
     };
 }

@@ -129,13 +129,23 @@
                 Valid Password is required
             </small>
         </div>
+        <div class="p-field">
+            <label for="resetemail">🔑 Confirm Password</label>
+            <input pInputText id="confirmpassword" type="password" formControlName="confirmpassword"
+                placeholder="confirm Password">
+            <small class="error-message"
+                *ngIf="UpdatetForm.get('confirmpassword')?.invalid && UpdatetForm.get('confirmpassword')?.touched">
+                Passwords do not match
+            </small>
+        </div>
 
 
         <div class="p-field">
-            <label for="resetemail">OTP</label>
-            <input pInputText id="otp" type="number" formControlName="otp" placeholder="Enter the OTP">
-            <small class="error-message" *ngIf="UpdatetForm.get('otp')?.invalid && UpdatetForm.get('otp')?.touched">
-                Valid email is required
+            <label for="resetemail">🔢OTP</label>
+            <input pInputText id="otp" type="password" formControlName="otp" placeholder="Enter the OTP">
+            <small class="error-message"
+                *ngIf="UpdatetForm.hasError('passwordMismatch')&&UpdatetForm.get('otp')?.invalid && UpdatetForm.get('otp')?.touched">
+                OTP Not Valid
             </small>
 
         </div>
