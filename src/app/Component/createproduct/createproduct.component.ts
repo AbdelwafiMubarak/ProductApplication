@@ -144,6 +144,4 @@ export class CreateProductComponent {
   handleFileError(event: any) {
     this.fileErrorMessage = 'Error uploading file. Ensure it is a valid image and within the size limit.';
   }
-
-
 }

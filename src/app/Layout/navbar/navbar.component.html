@@ -1,0 +1,16 @@
+<p-menubar [model]="leftMenuItems">
+    <ng-template pTemplate="start">
+
+    </ng-template>
+
+    <ng-template pTemplate="end">
+        <ng-container *ngFor="let item of rightMenuItems">
+            <a *ngIf="item.routerLink" [routerLink]="item.routerLink" class="auth-link">
+                <i [class]="item.icon"></i> {{ item.label }}
+            </a>
+            <a *ngIf="item.command" (click)="handleCommand($event, item)" class="auth-link">
+                <i [class]="item.icon"></i> {{ item.label }}
+            </a>
+        </ng-container>
+    </ng-template>
+</p-menubar>

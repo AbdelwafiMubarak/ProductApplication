@@ -63,6 +63,19 @@ input[type="file"]:hover {
     font-weight: normal;
 }
 
+/* .responsive-button {
+    /* flex-wrap: wrap;
+    justify-content: flex-start; */
+/* font-size: 1rem;
+    width: 50%;
+} */
+
+/* .responsive-title {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    font-size: 1rem;
+} */
+/* */
 .responsive-input-group {
     display: flex;
     flex-wrap: wrap;
@@ -104,7 +117,30 @@ input[type="file"]:hover {
         width: 100%;
         /* ✅ Full-width inputs/buttons on mobile */
     }
+
+    .responsive-button {
+        /* flex-wrap: wrap;
+        justify-content: flex-start; */
+        font-size: 1rem;
+        width: 50%;
+    }
+
+    .responsive-title {
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        font-size: 1rem;
+    }
+
+
+
+    responsive-searsh {
+        flex-wrap: wrap;
+        display: flex;
+        justify-content: flex-start;
+        font-size: 1rem;
+    }
 }
+
 
 p-dialog {
     transition: opacity 0.3s ease-in-out;

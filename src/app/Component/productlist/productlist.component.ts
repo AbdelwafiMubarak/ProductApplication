@@ -20,16 +20,17 @@ import { ViewChild } from '@angular/core';
 import { JwtUtilService } from '../../services/JwtUtilService';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-interface Product {
-  id: number;
-  name: string;
-  description: string;
-  imageUrl: string;
-  price: number;
-  createdBy: string;
+import { Product } from '../../Models/product';
+// interface Product {
+//   id: number;
+//   name: string;
+//   description: string;
+//   imageUrl: string;
+//   price: number;
+//   createdBy: string;
 
 
-}
+// }
 
 @Component({
   selector: 'app-productlist',
@@ -418,73 +419,27 @@ export class ProductListComponent implements OnInit {
   //   }
   // }
 
-  downloadSelectedProducts(id: number) {
-    const selectedProducttodownload = this.products.find(p => p.id === id);
-    if (!selectedProducttodownload) {
-      return;
-    }
 
-    const doc = new jsPDF();
 
-    // Title
-    doc.setFontSize(16);
-    doc.text('Selected Product Details', 14, 15);
 
-    // Prepare table headers
-    const headers = [['ID', 'Name', 'Description', 'Price']];
-    const data = [[
-      selectedProducttodownload.id,
-      selectedProducttodownload.name,
-      selectedProducttodownload.description,
-      selectedProducttodownload.price,
-    ]];
 
-    const addImageAfterTable = (finalY: number) => {
-      if (selectedProducttodownload.imageUrl) {
-        const img = new Image();
-        img.src = selectedProducttodownload.imageUrl; // Image URL or Base64 data
 
-        img.onload = () => {
-          const extension = selectedProducttodownload.imageUrl.split('.').pop()?.toUpperCase();
-          const supportedFormats = ['JPEG', 'JPG', 'PNG', 'WEBP'];
 
-          // Default to 'JPEG' if the format is unsupported
-          const format = supportedFormats.includes(extension!) ? extension! : 'JPEG';
 
-          // Add the image after the table
-          const imageYPosition = finalY + 10; // Add 10 units of padding after the table
-          doc.addImage(img, format, 14, imageYPosition, 100, 50);
 
-          // Save the PDF after image is added
-          doc.save(`${selectedProducttodownload.name}.pdf`);
-        };
-      }
-      // console.log("dowload file end");
 
-    };
 
-    // Draw the table
-    const table = autoTable(doc, {
-      startY: 25, // Position after the title
-      head: headers,
-      body: data,
-      theme: 'striped',
-      styles: {
-        fontSize: 10,
-        cellPadding: 3,
-      },
-      headStyles: {
-        fillColor: [41, 128, 185],
-        textColor: 255,
-        fontStyle: 'bold',
-      },
-      didDrawPage: (data) => {
-        // After the table is drawn, add the image
-        const finalY = data.cursor ? data.cursor.y : 80;// Get the Y position where the table ends
-        addImageAfterTable(finalY);
-      }
-    });
-  }
+
+
+
+
+
+
+
+
+
+
+
   // onFileChange(event: any) {
   //   // const file = event.target.files[0];
   //   const file = event.files[0];
@@ -515,6 +470,74 @@ export class ProductListComponent implements OnInit {
   //   this.fileError = true
   //   this.fileErrorMessage = '  Ensure it is a valid image and within the size limit.';
   // }
+
+
+  downloadSelectedProducts(id: number) {
+    const selectedProducttodownload = this.products.find(p => p.id === id);
+    if (!selectedProducttodownload) {
+      return;
+    }
+
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text('Selected Product Details', 14, 15);
+
+    const headers = [['ID', 'Name', 'Description', 'Price']];
+    const data = [[
+      selectedProducttodownload.id,
+      selectedProducttodownload.name,
+      selectedProducttodownload.description,
+      selectedProducttodownload.price,
+    ]];
+
+    // Generate table and capture the ending Y position
+    autoTable(doc, {
+      startY: 25, // Position after the title
+      head: headers,
+      body: data,
+      theme: 'striped',
+      styles: { fontSize: 10, cellPadding: 3 },
+      headStyles: { fillColor: [41, 128, 185], textColor: 255, fontStyle: 'bold' },
+      didDrawPage: (data) => {
+        const finalY = (data.cursor?.y ?? 80) + 10; // Position image 10 units below the table
+
+        if (selectedProducttodownload.imageUrl) {
+          fetch(selectedProducttodownload.imageUrl)
+            .then(response => response.blob())
+            .then(blob => {
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                const base64Image = reader.result as string;
+                doc.addImage(base64Image, 'JPEG', 14, finalY, 100, 50);
+                doc.save(`${selectedProducttodownload.name}.pdf`);
+              };
+              reader.readAsDataURL(blob);
+            })
+            .catch(error => {
+              console.error('Error loading image:', error);
+              doc.save(`${selectedProducttodownload.name}.pdf`); // Save even if image fails
+            });
+        } else {
+          doc.save(`${selectedProducttodownload.name}.pdf`);
+        }
+      }
+    });
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   onFileChange(event: any) {
     this.fileErrorMessage = ''; // Reset error message
     const file = event.files[0];

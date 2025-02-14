@@ -10,8 +10,8 @@
 
 
     <ng-template pTemplate="title">
-        <div class="title-container">
-            <span>Product board</span>
+        <div class="title-container responsive-button">
+            <span class=" responsive-title">Product board</span>
 
 
             <button (click)="goToAddProduct()" pButton type="button" label="Add product " icon="pi pi-plus"
@@ -29,31 +29,17 @@
 
 
 
-        <!-- <div class="p-inputgroup" style="margin-bottom: 1rem; width: 60%;">
-            <input type="text" pInputText placeholder="Search by name..." [(ngModel)]="filterText" />
 
-
-
-
-
-
-            <button pButton type="button" icon="pi pi-search" label="Search" (click)="filterProducts()"></button>
-            <button pButton type="button" icon="pi pi-refresh" class="p-button-secondary"
-                (click)="resetFilter()"></button>
-
-            <p-dropdown [options]="priceRanges" [(ngModel)]="selectedPriceRange" placeholder="Filter by Price"
-                optionLabel="label" [style]="{ width: '100%' }" (onChange)="filterProducts()">
-            </p-dropdown>
-        </div> -->
         <div class="p-inputgroup responsive-input-group">
 
 
-
             <input type="text" pInputText placeholder="Search by name..." [(ngModel)]="filterText"
-                (keydown.enter)="filterProductsByPrice()" [style.width]="'30%'" />
+                (keydown.enter)="filterProductsByPrice()" [style.width]="'30%'" class="responsive-searsh" />
 
             <button pButton type="button" icon="pi pi-search" label="Search" (click)="filterProductsByPrice()"
                 [style.width]="'5%'"></button>
+
+
             <button pButton type="button" icon="pi pi-refresh" class="p-button-secondary"
                 (click)="resetFilter()"></button>
 
