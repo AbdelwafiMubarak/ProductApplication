@@ -45,9 +45,9 @@ export class LoginComponent {
   resetForm: FormGroup;
   UpdatetForm: FormGroup;
   Email: string = "";
-  apiUrlLogin = 'https://localhost:44394/api/Account/Token';
-  apiUrlsetPassword = 'https://localhost:44394/api/Account/SetPassword';
-  apiUrlForrgotPassword = 'https://localhost:44394/api/Account/ForgetPassword';
+  apiUrlLogin = 'https://localhost:44388/auth/account/Token';
+  apiUrlsetPassword = 'https://localhost:44388/auth/account/SetPassword';
+  apiUrlForrgotPassword = 'https://localhost:44388/auth/account/ForgetPassword';
   logedin = false;
   displayResetDialog: boolean = false;
   updatepasswordDialog: boolean = false;
@@ -114,7 +114,7 @@ export class LoginComponent {
           }
           localStorage.setItem('authToken', response.data.token);
 
-          localStorage.setItem('user', response.data.userId);
+          localStorage.setItem('user', response.data.userName);
           let user: string = response.data.token;
           this.showMessage(response.message || 'Login successful!', 'success');
 

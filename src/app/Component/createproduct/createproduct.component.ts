@@ -31,7 +31,7 @@ export class CreateProductComponent {
   productForm: FormGroup;
   selectedFile: File | null = null;
   fileError = false;
-  apiUrl = 'https://localhost:44394/api/Product/AddProductAsync';
+  apiUrl = 'https://localhost:44388/productservice/product/AddProductAsync';
   fileErrorMessage: string = '';
   constructor(
     private fb: FormBuilder,

@@ -21,16 +21,7 @@ import { JwtUtilService } from '../../services/JwtUtilService';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { Product } from '../../Models/product';
-// interface Product {
-//   id: number;
-//   name: string;
-//   description: string;
-//   imageUrl: string;
-//   price: number;
-//   createdBy: string;
 
-
-// }
 
 @Component({
   selector: 'app-productlist',
@@ -56,16 +47,11 @@ export class ProductListComponent implements OnInit {
     { label: 'Above $200', value: { min: 200, max: Infinity } }
   ];
   priceRanges2 = ['All', 'Below $50', '$50 - $100', '$100 - $200', 'Above $200'];
-
-
   // selectedPriceRange: { min: number, max: number } | null = null;
   selectedPriceRange: any;
-
-
   // ✅ Variables for editing
   displayEditDialog: boolean = false;
   selectedProduct: Product = { id: 0, name: '', description: '', imageUrl: '', price: 0, createdBy: '' };
-
   selectedFile: File | null = null;
   fileError = false;
   fileErrorMessage: string = '';
@@ -95,12 +81,12 @@ export class ProductListComponent implements OnInit {
 
       //console.log("filter price passed to the fetch");
 
-      this.apiUrl = `https://localhost:44394/api/Product/GetProductFilteredAsync?min=${priceRange.min}&max=${priceRange.max}&name=${filter}`;
+      this.apiUrl = `https://localhost:44388/productservice/product/GetProductFilteredAsync?min=${priceRange.min}&max=${priceRange.max}&name=${filter}`;
     }
     else {
       this.apiUrl = filter ?
-        `https://localhost:44394/api/Product/SearchProductByName?name=${filter}`
-        : this.apiUrl = `https://localhost:44394/api/Product/GetAllOrderdIdAsending`;
+        `https://localhost:44388/productservice/product/SearchProductByName?name=${filter}`
+        : this.apiUrl = `https://localhost:44388/productservice/product/GetAllOrderdIdAsending`;
     }
 
     this.http.get<Product[]>(this.apiUrl, { headers }).subscribe({
@@ -182,7 +168,7 @@ export class ProductListComponent implements OnInit {
       form.append('file', new Blob());  // Appending an empty file to represent null
     }
 
-    this.http.put(`https://localhost:44394/api/Product/UpdateProductAsync/?id=${this.selectedProduct.id}`, form, { headers }).subscribe({
+    this.http.put(`https://localhost:44388/productservice/product/UpdateProductAsync/?id=${this.selectedProduct.id}`, form, { headers }).subscribe({
       next: (response: any) => {
         if (response.statusCode != 200) {
           this.showMessage(response.message || 'Something went wrong', 'error');
@@ -217,8 +203,6 @@ export class ProductListComponent implements OnInit {
 
 
 
-
-
   confirmDelete(id: number) {
     // console.log('confirm function.');
     this.confirmationService.confirm({
@@ -243,7 +227,7 @@ export class ProductListComponent implements OnInit {
     // ✅ Add Authorization header if token exists
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     // console.log(`Deleting product ID: ${id}`);
-    this.http.delete(`https://localhost:44394/api/Product/DeleteProductAsync?Id=${id}`, { headers }).subscribe({
+    this.http.delete(`https://localhost:44388/productservice/product/DeleteProductAsync?Id=${id}`, { headers }).subscribe({
       next: (response: any) => {
         if (response.statusCode != 200) {
           this.showMessage(response.message || 'Something went wrong', 'error');
@@ -525,19 +509,6 @@ export class ProductListComponent implements OnInit {
   }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
   onFileChange(event: any) {
     this.fileErrorMessage = ''; // Reset error message
     const file = event.files[0];
@@ -567,14 +538,6 @@ export class ProductListComponent implements OnInit {
   handleFileError(event: any) {
     this.fileErrorMessage = 'Error uploading file. Ensure it is a valid image and within the size limit.';
   }
-
-
-
-
-
-
-
-
 
 
   reseterr() {

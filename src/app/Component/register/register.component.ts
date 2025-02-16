@@ -5,7 +5,6 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-// PrimeNG Modules
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { ButtonModule } from 'primeng/button';
@@ -15,7 +14,6 @@ import { passwordStrengthValidator } from '../../Validators/Password_validator';
 import { MessagesModule } from 'primeng/messages';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
-
 @Component({
   selector: 'app-register',
   standalone: true,
@@ -70,7 +68,7 @@ export class RegisterComponent {
     formData.append("password", this.registerForm.value.password);
 
     const headers = {};
-    this.http.post('https://localhost:44394/api/Account/Register', formData, { headers })
+    this.http.post('https://localhost:44388/auth/account/Register', formData, { headers })
       .subscribe({
         next: (response: any) => {
           // this.isSubmitting = false;
