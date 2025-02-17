@@ -1,7 +1,7 @@
 
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessageService } from 'primeng/api';
-import { Component, importProvidersFrom, OnInit } from '@angular/core';
+import { Component, HostListener, importProvidersFrom, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CommonModule, } from '@angular/common';
 import { TableModule } from 'primeng/table';
@@ -20,7 +20,8 @@ import { ViewChild } from '@angular/core';
 import { JwtUtilService } from '../../services/JwtUtilService';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { Product } from '../../Models/product';
+import { PageFilterDTO, Product } from '../../Models/product';
+import { debounceTime, Subject } from 'rxjs';
 
 
 @Component({
@@ -35,8 +36,20 @@ export class ProductListComponent implements OnInit {
   @ViewChild('fileUpload', { static: false }) fileUpload: FileUpload | undefined;// 
   products: Product[] = [];
   loading: boolean = true;
+  showOptions: { [productId: number]: boolean } = {};
   apiUrl = 'https://localhost:44394/api/Product/GetAllAsync'; // Replace with your API endpoint
+  productFilter: PageFilterDTO = {
+    NameAscending: true,
+    NameDecending: false,
+    PriceMin: 0,
+    PriceMax: 0,
+    PageNumber: 1,
+    PageSize: 5,
+    Name_search: ''
+  };
 
+  totalRecords: number = 0;
+  private filterSubject: Subject<string> = new Subject<string>();
   displayImagePopup: boolean = false;
   popupImageUrl: string = '';
   priceRanges = [
@@ -48,7 +61,7 @@ export class ProductListComponent implements OnInit {
   ];
   priceRanges2 = ['All', 'Below $50', '$50 - $100', '$100 - $200', 'Above $200'];
   // selectedPriceRange: { min: number, max: number } | null = null;
-  selectedPriceRange: any;
+  selectedPriceRange: any = null;
   // ✅ Variables for editing
   displayEditDialog: boolean = false;
   selectedProduct: Product = { id: 0, name: '', description: '', imageUrl: '', price: 0, createdBy: '' };
@@ -60,15 +73,26 @@ export class ProductListComponent implements OnInit {
     private toastr: ToastrService, private jwtUtil: JwtUtilService, private messageService: MessageService) { }
 
   ngOnInit() {
-    const tokenn = localStorage.getItem('authToken'); // Assuming the token is stored in localStorage
+    // const tokenn = localStorage.getItem('authToken'); // Assuming the token is stored in localStorage
     // this.currentUserEmail = this.jwtUtil.getEmailFromToken(tokenn || '');
     // console.log(this.currentUserEmail);
     // console.log("this.currentUserEmail");
 
     this.currentUserEmail = localStorage.getItem('user') ?? null;
     // console.log(this.currentUserEmail);
-
-    this.fetchProducts();
+    this.filterSubject.pipe(
+      debounceTime(1000)  // Wait for 1 second after the last input
+    ).subscribe(searchText => {
+      this.filterText = searchText
+      this.productFilter.Name_search = searchText;
+      this.filterProductsByPrice();
+    });
+    // this.fetchProducts();
+    this.newfetch();
+  }
+  onSearchChange() {
+    // Push the new search text to the subject
+    this.filterSubject.next(this.filterText);
   }
   filterText: string = "";
   fetchProducts(filter: string = "", priceRange: { min: number, max: number } | null = null) {
@@ -95,12 +119,17 @@ export class ProductListComponent implements OnInit {
 
 
           this.products = response.data;
+
+
+          console.log(this.products.length);
+
+
           this.loading = false;
           this.showMessage(response.message || 'Something went wrong', 'error');
           return
         }
         this.products = response.data;
-
+        this.totalRecords = this.products.length;
 
         this.loading = false;
         if (this.fileUpload) {
@@ -191,8 +220,8 @@ export class ProductListComponent implements OnInit {
           this.fileUpload.clear();
         }
         this.displayEditDialog = false;
-
-        this.fetchProducts(); // Refresh list
+        this.newfetch()
+        //this.fetchProducts(); // Refresh list
       },
       error: (error) => {
         console.error('Error updating product:', error);
@@ -261,6 +290,50 @@ export class ProductListComponent implements OnInit {
   }
 
 
+  // filterProductsByPrice() {
+  //   const filter = this.filterText;
+  //   const priceRange: any = this.selectedPriceRange;
+  //   // console.log("start filterProductsByPrice");
+  //   if (priceRange) {
+  //     if (priceRange.value.min === 0 && priceRange.value.max === Infinity) {
+  //       // this.fetchProducts(filter, { 'min': 0, 'max': 10000000 });
+  //       //this.fetchProducts(filter)
+  //       this.fetchProducts(filter, { 'min': priceRange.value.min, 'max': 0 });
+
+  //       //this.resetFilter();
+  //       // console.log(" 0 infenity");
+
+  //       return;
+  //     }
+
+  //     if (priceRange.value.min === 0 && priceRange.value.max === 50) {
+  //       // this.fetchProducts(filter, { 'min': 0, 'max': 10000000 });
+  //       //this.fetchProducts(filter)
+  //       this.fetchProducts(filter, { 'min': priceRange.value.min, 'max': priceRange.value.max - 1 });
+
+  //       //this.resetFilter();
+  //       // console.log(" 0 infenity");
+
+  //       return;
+  //     }
+
+
+  //     if (priceRange.value.min === 200 && priceRange.value.max === Infinity) {
+  //       this.fetchProducts(filter, { 'min': priceRange.value.min, 'max': 10000000 });
+  //       // console.log(" 200 infenity");
+  //       return;
+  //     }
+  //     if (priceRange.value.min && priceRange.value.max) {
+  //       // console.log("start filv");
+  //       this.fetchProducts(filter, { 'min': priceRange.value.min, 'max': priceRange.value.max });
+  //       return;
+  //     }
+  //   }
+  //   this.fetchProducts(filter);
+  //   // console.log(" last");
+  // }
+
+
   filterProductsByPrice() {
     const filter = this.filterText;
     const priceRange: any = this.selectedPriceRange;
@@ -269,40 +342,63 @@ export class ProductListComponent implements OnInit {
       if (priceRange.value.min === 0 && priceRange.value.max === Infinity) {
         // this.fetchProducts(filter, { 'min': 0, 'max': 10000000 });
         //this.fetchProducts(filter)
-        this.fetchProducts(filter, { 'min': priceRange.value.min, 'max': 0 });
-
+        //this.fetchProducts(filter, { 'min': priceRange.value.min, 'max': 0 });
+        this.productFilter.PriceMin = priceRange.value.min;
+        this.productFilter.PriceMax = 100000000;
         //this.resetFilter();
         // console.log(" 0 infenity");
-
+        this.newfetch()
         return;
       }
 
       if (priceRange.value.min === 0 && priceRange.value.max === 50) {
         // this.fetchProducts(filter, { 'min': 0, 'max': 10000000 });
         //this.fetchProducts(filter)
-        this.fetchProducts(filter, { 'min': priceRange.value.min, 'max': priceRange.value.max - 1 });
-
+        // this.fetchProducts(filter, { 'min': priceRange.value.min, 'max': priceRange.value.max - 1 });
+        this.productFilter.PriceMin = priceRange.value.min;
+        this.productFilter.PriceMax = priceRange.value.max - 1;
         //this.resetFilter();
         // console.log(" 0 infenity");
-
+        this.newfetch()
         return;
       }
 
 
       if (priceRange.value.min === 200 && priceRange.value.max === Infinity) {
-        this.fetchProducts(filter, { 'min': priceRange.value.min, 'max': 10000000 });
+        // this.fetchProducts(filter, { 'min': priceRange.value.min, 'max': 10000000 });
         // console.log(" 200 infenity");
+        this.productFilter.PriceMin = priceRange.value.min;
+        this.productFilter.PriceMax = 10000000;
+        this.newfetch()
         return;
       }
       if (priceRange.value.min && priceRange.value.max) {
         // console.log("start filv");
-        this.fetchProducts(filter, { 'min': priceRange.value.min, 'max': priceRange.value.max });
+        // this.fetchProducts(filter, { 'min': priceRange.value.min, 'max': priceRange.value.max });
+        this.productFilter.PriceMin = priceRange.value.min;
+        this.productFilter.PriceMax = priceRange.value.max;
+        this.newfetch()
         return;
       }
     }
-    this.fetchProducts(filter);
+    this.newfetch();
+    // this.fetchProducts(filter);
     // console.log(" last");
   }
+
+
+  onPageChange(event: any) {
+    // console.log("✅ onPageChange Triggered", event);
+    this.productFilter.PageNumber = event.first / event.rows + 1;
+    this.productFilter.PageSize = event.rows;
+    this.newfetch();
+    // console.log("onpagechange");
+
+  }
+
+
+
+
 
 
 
@@ -314,7 +410,16 @@ export class ProductListComponent implements OnInit {
   // 🔄 Reset Filter
   resetFilter() {
     this.filterText = "";
-    this.fetchProducts();
+    this.productFilter.NameAscending = true;
+    this.productFilter.NameDecending = false;
+    this.productFilter.PriceMin = 0;
+    this.productFilter.PriceMax = 0;
+    this.productFilter.PageNumber = 1;
+    this.productFilter.PageSize = 5;
+    this.productFilter.Name_search = '';
+    this.selectedPriceRange = null;
+    this.newfetch()
+    //this.fetchProducts();
   }
 
   blockInvalidInput(event: KeyboardEvent) {
@@ -545,10 +650,72 @@ export class ProductListComponent implements OnInit {
     this.selectedFile = null;
 
   }
+  toggleOptions(productId: number) {
+    this.showOptions[productId] = !this.showOptions[productId];
+  }
+  @HostListener('document:click', ['$event'])
+  handleClickOutside(event: Event): void {
+    // If the clicked element is not inside the dropdown or the toggle button, close the dropdown
+    const clickedElement = event.target as HTMLElement;
+    if (!clickedElement.closest('.dropdown-container')) {
+      this.showOptions = {}; // Close all dropdowns
+    }
+  }
+  namesorting() {
 
+    this.productFilter.NameAscending = !this.productFilter.NameAscending;
+    this.productFilter.NameDecending = !this.productFilter.NameDecending;
+    this.newfetch();
+  }
+
+  newfetch() {
+
+
+    const token = localStorage.getItem('authToken');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    this.loading = true;
+
+
+    // console.log("filter price passed to the fetch");
+
+    this.apiUrl = `https://localhost:44388/productservice/product/GetProductPage?NameAscending=${this.productFilter.NameAscending}&NameDecending=${this.productFilter.NameDecending}&PriceMin=${this.productFilter.PriceMin}&PriceMax=${this.productFilter.PriceMax}&PageNumber=${this.productFilter.PageNumber}&PageSize=${this.productFilter.PageSize}&Name_search=${this.productFilter.Name_search}`;
+
+
+
+
+    this.http.get<Product[]>(this.apiUrl, { headers, observe: 'response' }).subscribe({
+      next: (response: any) => {
+        if (response.body.statusCode != 200) {
+
+
+          this.products = response.data;
+          this.loading = false;
+          this.showMessage(response.message || 'Something went wrong', 'error');
+          return
+        }
+        this.products = response.body.data;
+        const pagination = response.headers.get('pagination');
+        if (pagination) {
+          // console.log(pagination);
+
+          const paginationData = JSON.parse(pagination);
+          this.totalRecords = paginationData.totalCount;
+        }
+        this.loading = false;
+        if (this.fileUpload) {
+          this.fileUpload.clear();
+        }
+
+      },
+      error: (error) => {
+        this.showMessage(error.message || 'Something went wrong', 'error');
+        console.error('Error fetching products:', error);
+        this.loading = false;
+      }
+    });
+  }
 
 
 }
-
 
 

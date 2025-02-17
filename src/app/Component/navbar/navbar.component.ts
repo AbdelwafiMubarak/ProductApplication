@@ -58,5 +58,12 @@ export class NavbarComponent implements OnInit {
       item.command({ originalEvent: event, item });
     }
   }
+  ngAfterViewInit() {
+    setTimeout(() => {
+      const hiddenElements = document.querySelectorAll('.p-menuitem-link[aria-hidden="true"]');
+      hiddenElements.forEach(el => el.removeAttribute('aria-hidden'));
+    }, 100); // Ensure it's removed after rendering
+  }
+
 }
 
