@@ -59,7 +59,8 @@
 
 
         <p-table [value]="products" [paginator]="true" [loading]="loading" [rows]="productFilter.PageSize" [lazy]="true"
-            [totalRecords]="totalRecords" (onPage)="onPageChange($event)" [rowsPerPageOptions]="[5, 10, 15]">
+            [totalRecords]="totalRecords" (onPage)="onPageChange($event)">
+            <!-- [rowsPerPageOptions]="[5, 10, 15]" -->
             <ng-template pTemplate="header">
                 <tr>
                     <!-- <th pSortableColumn="id">ID <p-sortIcon field="id"></p-sortIcon></th> -->

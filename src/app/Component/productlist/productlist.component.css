@@ -24,6 +24,11 @@ p-card {
     margin-bottom: 0.5rem;
 }
 
+.p-field label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
 input[type="file"] {
     padding: 0.5rem;
     border: 1px solid #ccc;

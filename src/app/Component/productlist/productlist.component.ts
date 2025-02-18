@@ -265,6 +265,7 @@ export class ProductListComponent implements OnInit {
         this.products = this.products.filter(product => product.id !== id); // Remove from UI
         console.log('Product deleted successfully.');
         this.showMessage(response.message || 'Product deleted successfully', 'success');
+        this.newfetch();
       },
       error: (error) => {
         console.error('Error deleting product:', error);
