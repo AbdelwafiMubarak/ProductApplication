@@ -4,7 +4,6 @@
         <ng-template pTemplate="title">
             <h2>📝 Register</h2>
         </ng-template>
-
         <ng-template pTemplate="content">
             <form [formGroup]="registerForm" (ngSubmit)="onSubmit() " autocomplete="off">
                 <!-- First Name Field -->
@@ -20,8 +19,6 @@
                 <!-- ✅ Dummy hidden fields to trick browser -->
                 <input type="text" style="display: none;" autocomplete="username">
                 <input type="password" style="display: none;" autocomplete="new-password">
-
-
                 <!-- Email Field -->
                 <div class="p-field">
                     <label for="email">📧 Email</label>
@@ -63,10 +60,6 @@
                         </small>
                     </small>
                 </div>
-
-
-
-                <!-- Submit Button -->
                 <div class="button-group">
                     <p-button label="Register" icon="pi pi-user-plus" type="submit"
                         [disabled]="registerForm.invalid"></p-button>

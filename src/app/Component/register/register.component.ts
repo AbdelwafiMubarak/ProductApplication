@@ -14,6 +14,7 @@ import { passwordStrengthValidator } from '../../Validators/Password_validator';
 import { MessagesModule } from 'primeng/messages';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { environment } from '../../../environments/environment';
 @Component({
   selector: 'app-register',
   standalone: true,
@@ -36,7 +37,7 @@ import { ToastModule } from 'primeng/toast';
 })
 export class RegisterComponent {
   registerForm: FormGroup;
-  apiUrl = 'https://localhost:44394/api/Account/Register';
+  apiUrl = environment.Account.RegisterURL;
   messages: { severity: string; summary: string; detail: string }[] = [];
   constructor(
     private fb: FormBuilder,
@@ -57,30 +58,24 @@ export class RegisterComponent {
   }
   ngOnInit() {
     this.registerForm.reset();
-
   }
-
   onSubmit() {
     console.log("sumitting:");
     const formData = new FormData();
-    formData.append("FirstName", this.registerForm.value.firstName);  // 👈 Make sure field names match API
+    formData.append("FirstName", this.registerForm.value.firstName);
     formData.append("email", this.registerForm.value.email);
     formData.append("password", this.registerForm.value.password);
-
     const headers = {};
-    this.http.post('https://localhost:44388/auth/account/Register', formData, { headers })
+    this.http.post(this.apiUrl, formData, { headers })
       .subscribe({
         next: (response: any) => {
-          // this.isSubmitting = false;
           console.log("next:");
           console.log(response.success);
           console.log(response.message);
-
           if (response.statusCode != 201) {
             this.showMessage(response.message || 'Something went wrong', 'error');
             return
           }
-
           this.showMesssage(response.message, 'success');
           this.router.navigateByUrl('/login');
           this.registerForm.reset();
@@ -92,8 +87,6 @@ export class RegisterComponent {
       });
   }
 
-
-
   showMesssage(message: string, type: 'success' | 'error') {
     if (type === 'success') {
       this.toastr.success(message, 'Success'); // ✅ Success Toast
@@ -101,7 +94,6 @@ export class RegisterComponent {
       this.toastr.error(message, 'Error'); // ✅ Error Toast
     }
   }
-
   showMessage(message: string, type: 'success' | 'error') {
     this.messageService.add({
       severity: type,

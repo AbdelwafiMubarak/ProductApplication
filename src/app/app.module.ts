@@ -4,9 +4,8 @@ import { importProvidersFrom } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { BrowserModule } from '@angular/platform-browser';
 import { ButtonModule } from 'primeng/button';
-import { NavbarComponent } from './Component/navbar/navbar.component';
+import { NavbarComponent } from './Layout/navbar/navbar.component';
 import { LoginComponent } from './Component/login/login.component';
-
 bootstrapApplication(AppComponent, {
   providers: [
     importProvidersFrom(BrowserModule, ButtonModule),

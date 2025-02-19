@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { MenuItem } from 'primeng/api';
 import { MenubarModule } from 'primeng/menubar';
 import { RouterModule, Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service'; // ✅ Import AuthService
+import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-navbar',
@@ -17,26 +17,18 @@ export class NavbarComponent implements OnInit {
   rightMenuItems: MenuItem[] = [];
   isLoggedIn = false;
   token = "";
-
   constructor(private authService: AuthService, private router: Router) { }
-
   ngOnInit() {
     this.authService.isLoggedIn$.subscribe((loggedIn) => {
       this.isLoggedIn = loggedIn;
-      // this.token = localStorage.getItem('authToken') || '';
       this.updateMenu();
     });
   }
-
   updateMenu() {
-    // Left Menu Items
     this.leftMenuItems = [
       { label: 'Home', icon: 'pi pi-home', routerLink: [''] },
       { label: 'Products', icon: 'pi pi-box', routerLink: ['/productlist'] },
-      // { label: 'Contact', icon: 'pi pi-envelope', routerLink: ['/contact'] }
     ];
-
-    // Right Menu Items (Auth Section)
     this.rightMenuItems = this.isLoggedIn
       ? [
         { label: 'Logout', icon: 'pi pi-sign-out', command: () => this.logout() }
@@ -46,17 +38,21 @@ export class NavbarComponent implements OnInit {
         { label: 'Sign Up', icon: 'pi pi-user-plus', routerLink: ['/register'] }
       ];
   }
-
   logout() {
     localStorage.removeItem("authToken");
     this.authService.logout();
-    this.router.navigate(['']); // Redirect to home after logout
+    this.router.navigate(['']);
   }
-
   handleCommand(event: MouseEvent, item: MenuItem) {
     if (item.command) {
       item.command({ originalEvent: event, item });
     }
+  }
+  ngAfterViewInit() {
+    setTimeout(() => {
+      const hiddenElements = document.querySelectorAll('.p-menuitem-link[aria-hidden="true"]');
+      hiddenElements.forEach(el => el.removeAttribute('aria-hidden'));
+    }, 100);
   }
 }
 

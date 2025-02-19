@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { NavbarComponent } from "./Layout/navbar/navbar.component";
 import { RouterModule } from '@angular/router';
-
 import { CommonModule } from '@angular/common'; // Import CommonModule
 @Component({
   standalone: true,

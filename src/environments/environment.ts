@@ -1,21 +1,16 @@
-export const BaseAPIUrl = 'https://localhost:44394/api';
+export const BaseGatewayUrl = 'https://localhost:32769';
 export const environment = {
     production: false,
     Product: {
-        GetAllProducURL: ` ${BaseAPIUrl}/Product/GetAllAsync`,
-        GetPaginatedProducURL: ` ${BaseAPIUrl}/Product/GetProductPaginatedAsync`,
-        GetProductByIdAsyncURL: ` ${BaseAPIUrl}/Product/GetProductByIdAsync`,
-        AddProductAsyncURL: ` ${BaseAPIUrl}/Product/AddProductAsync`,
-        UpdateProductAsyncURL: ` ${BaseAPIUrl}/Product/UpdateProductAsync`,
-        DeleteProductAsyncURL: ` ${BaseAPIUrl}/Product/DeleteProductAsync`,
-
+        AddProductAsyncURL: `${BaseGatewayUrl}/productservice/product/AddProductAsync`,
+        UpdateProductAsyncURL: `${BaseGatewayUrl}/productservice/Product/UpdateProductAsync`,
+        DeleteProductAsyncURL: `${BaseGatewayUrl}/productservice/Product/DeleteProductAsync`,
+        GetProductPageURL: `${BaseGatewayUrl}/productservice/product/GetProductPage`,
     },
     Account: {
-        RegisterURL: ` ${BaseAPIUrl}/Account/Register`,
-        TokenURL: ` ${BaseAPIUrl}/Account/Token`,
-        GetGetProfileURL: ` ${BaseAPIUrl}/Account/GetProfile`,
-
+        RegisterURL: `${BaseGatewayUrl}/auth/account/Register`,
+        TokenURL: `${BaseGatewayUrl}/auth/account/Token`,
+        SetPasswordURL: `${BaseGatewayUrl}/auth/account/SetPassword`,
+        ForrgotPasswordURL: `${BaseGatewayUrl}/auth/account/ForgetPassword`
     },
-
-
 };

@@ -11,9 +11,7 @@ import { CardModule } from 'primeng/card';
 })
 export class HomeComponent {
   constructor(private router: Router) { }
-
   navigateTo(path: string) {
-
     this.router.navigateByUrl(`/${path}`);
   }
 }

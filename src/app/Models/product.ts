@@ -5,11 +5,7 @@ export interface Product {
     imageUrl: string;
     price: number;
     createdBy: string;
-
-
 }
-
-
 export class PageFilterDTO {
     NameAscending: boolean = true;
     NameDecending: boolean = false;

@@ -11,8 +11,6 @@ p-card {
     margin-right: 5px;
 }
 
-
-
 .p-field {
     display: flex;
     flex-direction: column;
@@ -68,58 +66,34 @@ input[type="file"]:hover {
     font-weight: normal;
 }
 
-/* .responsive-button {
-    /* flex-wrap: wrap;
-    justify-content: flex-start; */
-/* font-size: 1rem;
-    width: 50%;
-} */
-/* .responsive-title {
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    font-size: 1rem;
-} */
-/* */
 .responsive-input-group {
     display: flex;
     flex-wrap: wrap;
-    /* ✅ Allow items to wrap on smaller screens */
     gap: 0.5rem;
-    /* ✅ Add spacing between items */
     width: 100%;
-    /* ✅ Take full width of the parent container */
     max-width: 800px;
-    /* ✅ Limit the maximum width */
     align-items: center;
-    /* ✅ Align items vertically */
     justify-content: flex-start;
-    /* ✅ Align items to the left */
     margin: 0;
-    /* ✅ Remove center alignment */
 }
 
 .responsive-input-group input,
 .responsive-input-group button,
 .responsive-input-group p-dropdown {
     flex: 1 1 auto;
-    /* ✅ Allow items to grow and shrink */
     min-width: 150px;
-    /* ✅ Prevent items from becoming too small */
 }
 
-/* ✅ Stack items vertically on small screens */
 @media (max-width: 600px) {
     .responsive-input-group {
         flex-direction: column;
         align-items: flex-start;
-        /* ✅ Align items to the left when stacked */
     }
 
     .responsive-input-group button,
     .responsive-input-group p-dropdown,
     .responsive-input-group input {
         width: 100%;
-        /* ✅ Full-width inputs/buttons on mobile */
     }
 
     .responsive-button {
@@ -135,14 +109,11 @@ input[type="file"]:hover {
         font-size: 1rem;
     }
 
-
-
     responsive-searsh {
         flex-wrap: wrap;
         display: flex;
         justify-content: flex-start;
         font-size: 1rem;
-
     }
 }
 
@@ -163,21 +134,8 @@ p-dialog {
     text-align: left;
     margin: right 5px;
     ;
-    /* Prevents button text from wrapping */
-}
 
-/* .dropdown-options {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background: white;
-    padding: 5px;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
-    z-index: 10;
-    display: flex;
-    gap: 5px;
-} */
+}
 
 .dropdown-options {
     position: absolute;

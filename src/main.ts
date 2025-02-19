@@ -14,18 +14,13 @@ import { AuthGuard } from './app/services/auth.guard';
 import { provideHttpClient } from '@angular/common/http';
 import { CreateProductComponent } from './app/Component/createproduct/createproduct.component';
 import { provideToastr, ToastrModule } from 'ngx-toastr';
-
 const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent, canActivate: [GuestGuard] },
   { path: 'register', component: RegisterComponent, canActivate: [GuestGuard] },
   { path: 'productlist', component: ProductListComponent, canActivate: [AuthGuard] },
   { path: 'addproduct', component: CreateProductComponent, canActivate: [AuthGuard] },
-
-  // { path: '', redirectTo: '', pathMatch: 'full' }, // Default route
-  // { path: 'protected', component: ProtectedComponent, canActivate: [AuthGuard] }, 
 ];
-
 bootstrapApplication(AppComponent, {
   providers: [provideHttpClient(),
   provideRouter(routes),

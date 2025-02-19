@@ -1,17 +1,15 @@
-// 
-
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-// PrimeNG Modules
 import { InputTextModule } from 'primeng/inputtext';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ToastrService } from 'ngx-toastr';
 import { FileUploadModule } from 'primeng/fileupload';
+import { environment } from '../../../environments/environment';
 @Component({
   selector: 'app-create-product',
   standalone: true,
@@ -31,7 +29,7 @@ export class CreateProductComponent {
   productForm: FormGroup;
   selectedFile: File | null = null;
   fileError = false;
-  apiUrl = 'https://localhost:44388/productservice/product/AddProductAsync';
+  apiUrl = environment.Product.AddProductAsyncURL;
   fileErrorMessage: string = '';
   constructor(
     private fb: FormBuilder,
@@ -44,29 +42,21 @@ export class CreateProductComponent {
       name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
       description: ['', [Validators.required, Validators.minLength(5)]],
       price: ['', [Validators.required, Validators.pattern('^[0-9]+(\\.[0-9]{1,2})?$')]],
-      // file: ['', [Validators.required]]
-
     });
   }
-
-
-
   onSubmit() {
     if (this.productForm.invalid || !this.selectedFile) {
       this.fileError = !this.selectedFile; // Show error if no file is selected
       this.showMessage('Please fill all fields correctly and select a file!', 'error');
       return;
     }
-
     const formData = new FormData();
     formData.append('name', this.productForm.get('name')?.value);
     formData.append('description', this.productForm.get('description')?.value);
     formData.append('price', this.productForm.get('price')?.value);
     formData.append('file', this.selectedFile, this.selectedFile.name);
-
     const token = localStorage.getItem('authToken');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-
     this.http.post(this.apiUrl, formData, { headers }).subscribe({
       next: (response: any) => {
         if (response.statusCode != 201) {
@@ -76,7 +66,7 @@ export class CreateProductComponent {
         this.showMessage('Product created successfully!', 'success');
         this.router.navigateByUrl('/productlist');
         this.productForm.reset();
-        this.selectedFile = null; // Reset file after submission
+        this.selectedFile = null;
       },
       error: (error) => {
         console.error('Error creating product:', error);
@@ -84,12 +74,11 @@ export class CreateProductComponent {
       }
     });
   }
-
   showMessage(message: string, type: 'success' | 'error') {
     if (type === 'success') {
-      this.toastr.success(message, 'Success'); // ✅ Success Toast
+      this.toastr.success(message, 'Success');
     } else {
-      this.toastr.error(message, 'Error'); // ✅ Error Toast
+      this.toastr.error(message, 'Error');
     }
   }
   blockInvalidInput(event: KeyboardEvent) {
@@ -99,46 +88,24 @@ export class CreateProductComponent {
     }
   }
 
-
-  // onFileChange(event: any) {
-  //   this.fileErrorMessage = ''; // Reset error message
-  //   const file = event.files[0];
-
-  //   if (file && file.size > 3145728) { // 3MB size check
-  //     this.fileErrorMessage = 'Maximum upload size is 3 MB.';
-  //     return
-  //   }
-  //   this.selectedFile = file;
-  // }
-
-  // handleFileError(event: any) {
-  //   this.fileErrorMessage = 'Error uploading file. Ensure it is a valid image and within the size limit.';
-  // }
-
   onFileChange(event: any) {
-    this.fileErrorMessage = ''; // Reset error message
+    this.fileErrorMessage = '';
     const file = event.files[0];
-
-    // Check if a file is selected
     if (!file) {
       this.fileErrorMessage = 'Please select a file.';
       return;
     }
-
-    // Validate file size (3MB limit)
     if (file.size > 3145728) {
       this.fileErrorMessage = 'Maximum upload size is 3MB.';
       return;
     }
-
-    // Validate file type
     const allowedTypes = ['image/jpeg', 'image/png'];
     if (!allowedTypes.includes(file.type)) {
       this.fileErrorMessage = 'Only JPG and PNG images are allowed.';
       return;
     }
 
-    this.selectedFile = file; // Store valid file
+    this.selectedFile = file;
   }
 
   handleFileError(event: any) {

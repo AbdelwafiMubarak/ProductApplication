@@ -6,7 +6,6 @@ import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthService } from '../../services/auth.service';
-// PrimeNG Modules
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { ButtonModule } from 'primeng/button';
@@ -39,15 +38,14 @@ import { matchPasswords, passwordStrengthValidator } from '../../Validators/Pass
   ], providers: [MessageService]
 })
 export class LoginComponent {
-
   private environment = environment;
   loginForm: FormGroup;
   resetForm: FormGroup;
   UpdatetForm: FormGroup;
   Email: string = "";
-  apiUrlLogin = 'https://localhost:44388/auth/account/Token';
-  apiUrlsetPassword = 'https://localhost:44388/auth/account/SetPassword';
-  apiUrlForrgotPassword = 'https://localhost:44388/auth/account/ForgetPassword';
+  apiUrlLogin = environment.Account.TokenURL;
+  apiUrlsetPassword = environment.Account.SetPasswordURL;
+  apiUrlForrgotPassword = environment.Account.ForrgotPasswordURL;
   logedin = false;
   displayResetDialog: boolean = false;
   updatepasswordDialog: boolean = false;
@@ -71,7 +69,6 @@ export class LoginComponent {
     this.UpdatetForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6), passwordStrengthValidator()],],
-      // confirmpassword: ['', [Validators.required, Validators.minLength(6), passwordStrengthValidator()],],
       confirmpassword: ['', [Validators.required]],
       otp: ['', [Validators.required, Validators.minLength(6)],],
     },
@@ -80,16 +77,12 @@ export class LoginComponent {
         validator: matchPasswords('password', 'confirmpassword')
       }
     );
-
   }
   ngOnInit() {
     this.loginForm.reset();
     this.resetForm.reset();
     this.UpdatetForm.reset();
-
-
   }
-  // Validators.pattern('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{6,}$')
   onSubmit() {
     if (this.loginForm.invalid) {
       this.showMessage('Please fill all fields correctly!', 'error');
@@ -99,27 +92,19 @@ export class LoginComponent {
     const formData = new FormData();
     formData.append('email', this.loginForm.value.email);
     formData.append('password', this.loginForm.value.password);
-
     this.http.post(this.apiUrlLogin, formData)
       .subscribe({
-
-
         next: (response: any) => {
-          //  console.log(this.apiUrl);
-          // console.log(this.environment.Account.);
 
           if (response.statusCode != 201) {
             this.showMessage(response.message || 'Something went wrong', 'error');
             return
           }
           localStorage.setItem('authToken', response.data.token);
-
           localStorage.setItem('user', response.data.userName);
           let user: string = response.data.token;
           this.showMessage(response.message || 'Login successful!', 'success');
-
           this.authService.login(response.data.token);
-
           this.authService.isLoggedIn$.subscribe((loggedIn) => {
             this.logedin = loggedIn
           });
@@ -137,42 +122,27 @@ export class LoginComponent {
 
 
   openResetDialog() {
-    this.resetForm.reset(); // Clear previous input
+    this.resetForm.reset();
     this.displayResetDialog = true;
   }
-
 
   onForgotPassword() {
     if (this.resetForm.invalid) return;
     const formData = new FormData();
     formData.append('Email', this.resetForm.value.email);
-
-
     this.http.post(this.apiUrlForrgotPassword, formData)
       .subscribe({
-
-
         next: (response: any) => {
-          // console.error('response:', response);
-
           if (response.statusCode != 200) {
             this.showMessage(response.message || 'Something went wrong', 'error');
             return
           }
-
-
-
           this.showMessage(response.message || 'Login successful!', 'success');
-
-          // console.log("befor route");
-
-
           this.loginForm.reset();
           this.resetForm.reset();
           this.UpdatetForm.reset();
           this.displayResetDialog = false
           this.updatepasswordDialog = true
-
         },
         error: (error) => {
           console.error('Login Error:', error);
@@ -183,7 +153,6 @@ export class LoginComponent {
 
 
   }
-
 
   onSetPassword() {
     if (this.UpdatetForm.invalid) return;
@@ -191,33 +160,20 @@ export class LoginComponent {
     formData.append('email', this.UpdatetForm.value.email);
     formData.append('opt', this.UpdatetForm.value.otp);
     formData.append('password', this.UpdatetForm.value.password);
-
-
-
     this.http.put(this.apiUrlsetPassword, formData)
       .subscribe({
-
-
         next: (response: any) => {
-          // console.error('response:', response);
-
           if (response.statusCode != 200) {
             this.showMessage(response.message || 'Something went wrong', 'error');
             return
           }
-
-
-
           this.showMessage(response.message || 'Login successful!', 'success');
-
-          // console.log("befor route");
           this.loginForm.reset();
           this.resetForm.reset();
           this.UpdatetForm.reset();
           this.displayResetDialog = false
           this.updatepasswordDialog = false
           this.router.navigateByUrl('/login');
-
         },
         error: (error) => {
           console.error('Login Error:', error);
@@ -227,31 +183,25 @@ export class LoginComponent {
       });
   }
 
-
-
-
   showMessage(message: string, type: 'success' | 'error') {
     if (type === "success") {
       this.messageService.add({
         severity: type,
         summary: type === 'success' ? 'Success' : 'Error',
         detail: message,
-        life: 3000,// Auto-hide after 3 seconds
+        life: 3000,
         sticky: false,
         closable: false
       });
       return
     }
-
     this.messageService.add({
       severity: type,
       summary: 'Error',
       detail: message,
-      life: 3000,// Auto-hide after 3 seconds
+      life: 3000,
       sticky: true,
       closable: true
     });
   }
-
-
 }

@@ -12,7 +12,6 @@
                         Product name must contain at least one letter (Min Length:3)
                     </small>
                 </div>
-
                 <div class="p-field">
                     <label for="description">Description<span class="required">*</span></label>
                     <input pInputText id="description" formControlName="description" autocomplete="off"
@@ -22,8 +21,6 @@
                         Description is required (Min: 5 characters).
                     </small>
                 </div>
-
-
                 <div class="p-field">
                     <label for="price">Price<span class="required">*</span></label>
                     <input pInputText id="price" formControlName="price" placeholder="Enter product price" type="number"
@@ -33,14 +30,10 @@
                         price is required
                     </small>
                 </div>
-
-
-
                 <div class="p-field">
                     <label for="file">Product Image <span class="required">*</span>
                         <span class="supported">(only jpg and png images are supported, Max: 3MB)</span>
                     </label>
-
                     <p-fileUpload name="productImage" accept=".jpg,.jpeg,.png" [customUpload]="true"
                         (onSelect)="onFileChange($event)" [showUploadButton]="false" [showCancelButton]="true"
                         [invalidFileSizeMessageSummary]="'Maximum upload size is 3 MB  '"
@@ -51,8 +44,6 @@
 
 
                 </div>
-
-
                 <div class="button-group">
                     <button pButton label="Create Product" icon="pi pi-check" type="submit" class="p-button-success"
                         [disabled]="productForm.invalid || !selectedFile"></button><br><br>
