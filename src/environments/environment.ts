@@ -1,4 +1,4 @@
-export const BaseGatewayUrl = 'https://localhost:32775';
+export const BaseGatewayUrl = 'https://localhost:32787';
 export const environment = {
     production: false,
     Product: {

@@ -261,6 +261,8 @@ export class ProductListComponent implements OnInit {
   }
 
   downloadSelectedProducts(id: number) {
+    console.log("download hit");
+
     const selectedProducttodownload = this.products.find(p => p.id === id);
     if (!selectedProducttodownload) {
       return;
