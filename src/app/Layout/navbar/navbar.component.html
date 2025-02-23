@@ -1,10 +1,20 @@
-<p-menubar [model]="leftMenuItems">
+<p-menubar>
     <ng-template pTemplate="start">
+        <ng-container *ngFor="let item of leftMenuItems">
+            <a *ngIf="item.routerLink" [routerLink]="item.routerLink" class="auth-link"
+                [ngClass]="{'active': isActive(item.routerLink[0])}" [attr.aria-hidden]="false" tabindex="0">
+                <i [class]="item.icon"></i> {{ item.label }}
+            </a>
+            <a *ngIf="item.command" (click)="handleCommand($event, item)" class="auth-link" [attr.aria-hidden]="false"
+                tabindex="0">
+                <i [class]="item.icon"></i> {{ item.label }}
+            </a>
+        </ng-container>
     </ng-template>
     <ng-template pTemplate="end">
         <ng-container *ngFor="let item of rightMenuItems">
-            <a *ngIf="item.routerLink" [routerLink]="item.routerLink" class="auth-link" [attr.aria-hidden]="false"
-                tabindex="0">
+            <a *ngIf="item.routerLink" [routerLink]="item.routerLink" class="auth-link"
+                [ngClass]="{'active': isActive(item.routerLink[0])}" [attr.aria-hidden]="false" tabindex="0">
                 <i [class]="item.icon"></i> {{ item.label }}
             </a>
             <a *ngIf="item.command" (click)="handleCommand($event, item)" class="auth-link" [attr.aria-hidden]="false"
@@ -14,3 +24,17 @@
         </ng-container>
     </ng-template>
 </p-menubar>
+<p-overlayPanel #overlay>
+    <div class="flex align-items-center gap-3" style="width: 100%; justify-content: center; align-items: center;">
+        <div style="padding-left: 6ch;">
+            <i class="pi pi-user p-text-xl user-icon"></i>
+        </div>
+    </div>
+    <p class="text-lg m-0" style="font-size: 13px"><b>{{userEmail}}</b></p>
+    <div class="mt-3" style="width: 100%; justify-content: end; align-items: end;">
+        <button pButton type="button" class="p-button p-button-danger p-button-sm w-full test"
+            (click)="logout(overlay)">
+            <i class="pi pi-sign-out" style="padding-right: 2ch;"></i> Logout
+        </button>
+    </div>
+</p-overlayPanel>

@@ -15,6 +15,12 @@
                         *ngIf="registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched">
                         Name is required ( 3-20 characters)
                     </small>
+
+
+
+
+
+
                 </div>
                 <!-- ✅ Dummy hidden fields to trick browser -->
                 <input type="text" style="display: none;" autocomplete="username">
@@ -60,9 +66,33 @@
                         </small>
                     </small>
                 </div>
+                <div class="p-field">
+                    <label for="confirmpassword">🔑 Confirm Password</label>
+                    <p-password [inputStyle]="{'width':'100%'}" [style]="{'width':'100%'}" id="confirmpassword"
+                        formControlName="confirmpassword" toggleMask [feedback]="false"
+                        placeholder="Confirm your password" autocomplete="off">
+                    </p-password>
+                    <!-- <small class="error-message" *ngIf="confirmpassword?.invalid && confirmpassword?.touched">
+                        Password must be at least 6 characters.
+
+
+                    </small> -->
+                    <small class="error-message"
+                        *ngIf="registerForm.get('confirmpassword')?.invalid && registerForm.get('confirmpassword')?.touched">
+                        Passwords do not match
+                    </small>
+                </div>
+
+                <div class="p-field-checkbox">
+                    <p-checkbox name="isAdmin" formControlName="isAdmin" label="  an admin?" binary="true"
+                        (onChange)="clickcheck()"></p-checkbox>
+                </div>
+
+
+
                 <div class="button-group">
-                    <p-button label="Register" icon="pi pi-user-plus" type="submit"
-                        [disabled]="registerForm.invalid"></p-button>
+                    <p-button label=" Register" icon="pi pi-user-plus" type="submit" [disabled]="registerForm.invalid">
+                    </p-button>
                 </div>
             </form>
         </ng-template>

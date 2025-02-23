@@ -2,8 +2,9 @@
 <p-card>
     <ng-template pTemplate="title">
         <div class="title-container responsive-button">
-            <span class=" responsive-title">Product board</span>
-            <button (click)="goToAddProduct()" pButton type="button" label="Add product " icon="pi pi-plus"
+            <span class=" responsive-title">Product Board</span>
+            <!-- <button (click)="goToAddProduct()" pButton type="button" label="Add product " icon="pi pi-plus" -->
+            <button (click)="adddilogswitch()" pButton type="button" label="Add product " icon="pi pi-plus"
                 class="p-button-success"></button>
         </div>
     </ng-template>
@@ -15,22 +16,35 @@
             <button pButton type="button" icon="pi pi-refresh" class="p-button-secondary"
                 (click)="resetFilter()"></button>
             <p-dropdown [options]="priceRanges" [(ngModel)]="selectedPriceRange" placeholder="Filter by Price"
-                [style]="{ width: '100%' }" optionLabel="label" (onChange)="filterProductsByPrice()">
+                [style]="{ width: '100%' ,'text-align': 'end'}" optionLabel="label"
+                (onChange)="filterProductsByPrice()">
             </p-dropdown>
         </div>
         <br>
         <p-table [value]="products" [paginator]="true" [loading]="loading" [rows]="productFilter.PageSize" [lazy]="true"
-            [totalRecords]="totalRecords" (onPage)="onPageChange($event)">
+            [sortMode]="'multiple'" [totalRecords]="totalRecords" (onPage)="onPageChange($event)">
             <!-- [rowsPerPageOptions]="[5, 10, 15]" -->
             <ng-template pTemplate="header">
                 <tr>
-                    <th pSortableColumn="name" (click)="namesorting()">Name <p-sortIcon field="name"></p-sortIcon></th>
-                    <th> Owner </th>
-                    <th> Description </th>
-                    <th> price </th>
+                    <th pSortableColumn="name" (click)="customSort1('name')" style="width: 200px;">Name <p-sortIcon
+                            field="name"></p-sortIcon>
+                    </th>
+                    <th style="width: 200px;"> Owner </th>
+                    <th style="width: 300px;"> Description </th>
+
+                    <th pSortableColumn="price" (click)="customSort1('price')" style="width: 200px">
+                        Price <p-sortIcon field="price"></p-sortIcon>
+                    </th>
                     <th>Image</th>
-                    <th>Actions</th>
-                    <th>Download</th>
+                    <th style="width: 150px">Actions</th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th>
+                        <button pButton label="Export" (click)="downloadAllProducts()" icon="pi pi-download"
+                            class="p-button-sm p-button-info export-button"></button>
+                    </th>
+
                 </tr>
             </ng-template>
 
@@ -40,35 +54,36 @@
                     <td>{{ product.createdBy }}</td>
                     <td>{{ product.description }}</td>
                     <td>{{ product.price | currency: 'USD':'symbol':'1.2-2' }}</td>
-                    <td><img height="60" width="60" [src]="product.imageUrl"
-                            (mouseenter)="showImagePopup(product.imageUrl)" (mouseleave)="hideImagePopup()"
-                            style="cursor: pointer;" /></td>
-                    <td class="dropdown-container" style="position: relative;">
-                        <!-- Toggle Button -->
-                        <button pButton [icon]="showOptions[product.id] ? 'pi pi-chevron-up' : 'pi pi-chevron-down'"
-                            class="p-button-sm p-button-text p-button-secondary" (click)="toggleOptions(product.id)"
-                            pTooltip="More Options" tooltipPosition="top">
+
+                    <td>
+                        <button pButton icon="pi pi-eye" class="p-button-sm p-button-info ml-2"
+                            (click)="showImagePopup(product.imageUrl)" (mouseleave)="hideImagePopup()"
+                            pTooltip="View Product" tooltipPosition="top">
                         </button>
-                        <!-- Edit and Delete buttons (Dropdown) -->
-                        <div *ngIf="showOptions[product.id]" class="dropdown-options">
-                            <button pButton icon="pi pi-pencil" class="p-button-sm p-button-info"
-                                (click)="editProduct(product.id)" [disabled]="currentUserEmail !== product.createdBy"
-                                pTooltip="Edit Product" tooltipPosition="top">
-                            </button>
-                            <button pButton icon="pi pi-trash" class="p-button-sm p-button-danger ml-2"
-                                (click)="confirmDelete(product.id)" [disabled]="currentUserEmail !== product.createdBy"
-                                pTooltip="Delete Product" tooltipPosition="top">
-                            </button>
-                        </div>
                     </td>
-                    <td> <button pButton label="Download" (click)="downloadSelectedProducts(product.id)"
-                            icon="pi pi-download" class="p-button-sm p-button-info"
-                            [disabled]="currentUserEmail !== product.createdBy"></button></td>
+                    <td style="display: flex; gap: 5px; align-items: center;" class="action">
+
+                        <button pButton icon="pi pi-pencil" class="p-button-sm p-button-info"
+                            (click)="editProduct(product.id)" pTooltip="Edit Product" tooltipPosition="top">
+                        </button>
+                        <button pButton icon="pi pi-trash" class="p-button-sm p-button-danger ml-2"
+                            (click)="confirmDelete(product.id)" pTooltip="Delete Product" tooltipPosition="top">
+                        </button>
+
+
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+
                 </tr>
             </ng-template>
             <ng-template pTemplate="footer">
                 <tr>
                     <td colspan="8" class="text-right"><strong>Total Products : {{totalRecords }}</strong></td>
+                    <td></td>
+                    <td></td>
                 </tr>
             </ng-template>
             <h2>hhf</h2>
@@ -78,16 +93,16 @@
 </p-card>
 <p-dialog [(visible)]="displayImagePopup" [modal]="false" [dismissableMask]="true" [style]="{width: 'auto'}"
     [draggable]="false" [resizable]="false" [baseZIndex]="10000" [closable]="false" position="top">
-    <img [src]="popupImageUrl" style="max-width: 600px; max-height: 600px;" style="height: 250px; width: 200px;" />
+    <img [src]="imageUrl" style="max-width: 600px; max-height: 600px;" style="height: 250px; width: 200px;" />
 </p-dialog>
 
 <!-- ✅ Edit Product Dialog -->
 <p-dialog header="Edit Product" [(visible)]="displayEditDialog" [modal]="true" [closable]="true" [responsive]="false"
     [style]="{width: '400px'}" (onHide)=resetDialog()>
     <div class="p-fluid">
-        <div class="p-field">
+        <!-- <div class="p-field">
             <img [src]="selectedProduct.imageUrl" style="height: 400px; width: 300px;" />
-        </div><br>
+        </div><br> -->
         <div class="p-field">
             <label for="name">Product Name</label>
             <input pInputText id="name" [(ngModel)]="selectedProduct.name" minlength="3" required
@@ -95,7 +110,8 @@
         </div>
         <div class="p-field">
             <label for="description">Description</label>
-            <input pInputText id="description" [(ngModel)]="selectedProduct.description" minlength="5" required />
+            <input pInputText id="description" [(ngModel)]="selectedProduct.description" minlength="5" maxlength="40"
+                required />
         </div>
         <div class="p-field">
             <label for="price">Price</label>
@@ -122,4 +138,70 @@
         <button pButton label="Cancel" icon="pi pi-times" class="p-button-sm p-button-secondary"
             (click)="displayEditDialog=false;reseterr()"></button>
     </ng-template>
+</p-dialog>
+
+
+
+
+
+<!-- //add new product dailoge -->
+<p-dialog header="Add Product" [(visible)]="addprductdailuge" [modal]="true" [closable]="true" [responsive]="false"
+    [style]="{width: '400px'}" (onHide)=resetDialog()>
+    <!-- <div class="create-product-container"> -->
+    <!-- <p-card class="create-product-card"> -->
+    <ng-template pTemplate="title">Create New Product</ng-template>
+    <ng-template pTemplate="content">
+        <form [formGroup]="addproductForm" (ngSubmit)="onSubmit()" enctype="multipart/form-data">
+            <div class="p-field">
+                <label for="name">Product Name <span class="required">*</span></label>
+                <input pInputText id="name" formControlName="name" placeholder="Enter product name" autocomplete="off"
+                    pattern=".*[A-Za-z].*" />
+                <small class="error-message"
+                    *ngIf="addproductForm.get('name')?.invalid && addproductForm.get('name')?.touched || addproductForm.get('name')?.hasError('pattern')  ">
+                    Product name must contain at least one letter (Min Length:3)
+                </small>
+            </div>
+            <div class="p-field">
+                <label for="description">Description<span class="required">*</span></label>
+                <input pInputText id="description" formControlName="description" autocomplete="off"
+                    placeholder="Enter product description" />
+                <small class="error-message"
+                    *ngIf="addproductForm.get('description')?.invalid && addproductForm.get('description')?.touched">
+                    Description is required (Min: 5 characters).
+                </small>
+            </div>
+            <div class="p-field">
+                <label for="price">Price<span class="required">*</span></label>
+                <input pInputText id="price" formControlName="price" placeholder="Enter product price" type="number"
+                    inputmode="decimal" (keydown)="blockInvalidInput($event)" />
+                <small class="error-message"
+                    *ngIf="addproductForm.get('price')?.invalid && addproductForm.get('price')?.touched">
+                    price is required
+                </small>
+            </div>
+            <div class="p-field">
+                <label for="file">Product Image <span class="required">*</span>
+                    <span class="supported">(only jpg and png images are supported, Max: 3MB)</span>
+                </label>
+                <p-fileUpload name="productImage" accept=".jpg,.jpeg,.png" [customUpload]="true"
+                    (onSelect)="onFileChange($event)" [showUploadButton]="false" [showCancelButton]="true"
+                    [invalidFileSizeMessageSummary]="'Maximum upload size is 3 MB  '"
+                    [invalidFileTypeMessageSummary]="'Only JPG and PNG images are allowed '"
+                    [invalidFileTypeMessageDetail]="''">
+                    >
+                </p-fileUpload>
+
+
+            </div>
+            <div class="button-group">
+                <button pButton label="Create Product" icon="pi pi-check" type="submit" class="p-button-success"
+                    [disabled]="addproductForm.invalid || !selectedFile"></button><br><br>
+                <button pButton label="Cancel" icon="pi pi-times" type="button" class="p-button-secondary ml-2"
+                    (click)="addprductdailuge=false"></button>
+            </div>
+        </form>
+    </ng-template>
+    <!-- </p-card> -->
+    <!-- </div> -->
+
 </p-dialog>

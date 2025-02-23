@@ -17,6 +17,7 @@ import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { DialogModule } from 'primeng/dialog';
 import { matchPasswords, passwordStrengthValidator } from '../../Validators/Password_validator';
+import { getRoleFromToken } from '../../services/JwtUtilService';
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -88,11 +89,15 @@ export class LoginComponent {
       this.showMessage('Please fill all fields correctly!', 'error');
       return;
     }
+    const requestData = {
+      Email: this.loginForm.value.email,
+      Password: this.loginForm.value.password
+    };
+    this.http.post(this.apiUrlLogin, requestData, {
+      headers: { 'Content-Type': 'application/json' }
+    }
 
-    const formData = new FormData();
-    formData.append('email', this.loginForm.value.email);
-    formData.append('password', this.loginForm.value.password);
-    this.http.post(this.apiUrlLogin, formData)
+    )
       .subscribe({
         next: (response: any) => {
 
@@ -102,6 +107,10 @@ export class LoginComponent {
           }
           localStorage.setItem('authToken', response.data.token);
           localStorage.setItem('user', response.data.userName);
+          let role = getRoleFromToken(response.data.token) ?? "User"
+          localStorage.setItem('role', role);
+          // console.log("roooooooooole");
+          // console.log(getRoleFromToken(response.data.token));
           let user: string = response.data.token;
           this.showMessage(response.message || 'Login successful!', 'success');
           this.authService.login(response.data.token);
@@ -119,8 +128,6 @@ export class LoginComponent {
         },
       });
   }
-
-
   openResetDialog() {
     this.resetForm.reset();
     this.displayResetDialog = true;
@@ -128,52 +135,77 @@ export class LoginComponent {
 
   onForgotPassword() {
     if (this.resetForm.invalid) return;
-    const formData = new FormData();
-    formData.append('Email', this.resetForm.value.email);
-    this.http.post(this.apiUrlForrgotPassword, formData)
-      .subscribe({
-        next: (response: any) => {
-          if (response.statusCode != 200) {
-            this.showMessage(response.message || 'Something went wrong', 'error');
-            return
-          }
-          this.showMessage(response.message || 'Login successful!', 'success');
-          this.loginForm.reset();
-          this.resetForm.reset();
-          this.UpdatetForm.reset();
-          this.displayResetDialog = false
-          this.updatepasswordDialog = true
-        },
-        error: (error) => {
-          console.error('Login Error:', error);
-          const errorMsg = error.error?.message || 'Something went wrong. Please try again.';
-          this.showMessage(errorMsg, 'error');
-        },
-      });
+    const requestData = {
+      Email: this.resetForm.value.email
+    };
+    this.http.post(this.apiUrlForrgotPassword, requestData,
+      {
+        headers: { 'Content-Type': 'application/json' }
+      }
+    ).subscribe({
+      next: (response: any) => {
+        if (response.statusCode != 200) {
+          this.showMessage(response.message || 'Something went wrong', 'error');
+          return
+        }
+        this.showMessage(response.message || 'Login successful!', 'success');
+        this.loginForm.reset();
+        this.resetForm.reset();
+        this.UpdatetForm.reset();
+        this.displayResetDialog = false
+        this.updatepasswordDialog = true
+      },
+      error: (error) => {
+        console.error('Login Error:', error);
+        const errorMsg = error.error?.message || 'Something went wrong. Please try again.';
+        this.showMessage(errorMsg, 'error');
+      },
+    });
 
 
   }
-
   onSetPassword() {
     if (this.UpdatetForm.invalid) return;
-    const formData = new FormData();
-    formData.append('email', this.UpdatetForm.value.email);
-    formData.append('opt', this.UpdatetForm.value.otp);
-    formData.append('password', this.UpdatetForm.value.password);
-    this.http.put(this.apiUrlsetPassword, formData)
+    const requestData = {
+      Email: this.UpdatetForm.value.email,
+      OPT: this.UpdatetForm.value.otp,
+      Password: this.UpdatetForm.value.password
+    };
+    this.http.put(this.apiUrlsetPassword, requestData,
+      {
+        headers: { 'Content-Type': 'application/json' }
+      }
+    )
       .subscribe({
         next: (response: any) => {
-          if (response.statusCode != 200) {
+          // if (response.statusCode != 200) {
+          //   this.showMessage(response.message || 'Something went wrong', 'error');
+          //   return
+          // }
+          // this.showMessage(response.message || 'Login successful!', 'success');
+          // this.loginForm.reset();
+          // this.resetForm.reset();
+          // this.UpdatetForm.reset();
+          // this.displayResetDialog = false
+          // this.updatepasswordDialog = false
+          // this.router.navigateByUrl('/login');
+          if (response.statusCode != 201) {
             this.showMessage(response.message || 'Something went wrong', 'error');
             return
           }
+          localStorage.setItem('authToken', response.data.token);
+          localStorage.setItem('user', response.data.userName);
+          let user: string = response.data.token;
           this.showMessage(response.message || 'Login successful!', 'success');
-          this.loginForm.reset();
-          this.resetForm.reset();
-          this.UpdatetForm.reset();
-          this.displayResetDialog = false
-          this.updatepasswordDialog = false
-          this.router.navigateByUrl('/login');
+          this.authService.login(response.data.token);
+          this.authService.isLoggedIn$.subscribe((loggedIn) => {
+            // this.logedin = loggedIn
+          });
+
+          this.router.navigateByUrl('/');
+
+
+
         },
         error: (error) => {
           console.error('Login Error:', error);

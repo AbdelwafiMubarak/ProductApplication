@@ -19,3 +19,32 @@ export class JwtUtilService {
         }
     }
 }
+export function getEmailFromToken(token: string): string | null {
+    if (!token) {
+        return null;
+    }
+    try {
+        const payload = token.split('.')[1];
+        const decodedPayload = atob(payload);
+        const payloadObject = JSON.parse(decodedPayload);
+
+        return payloadObject.email || payloadObject.userEmail || null;
+    } catch (error) {
+        // console.error('Invalid JWT Token:', error);
+        return null;
+    }
+}
+export function getRoleFromToken(token: string): string | null {
+    if (!token) {
+        return null;
+    }
+    try {
+        const payload = token.split('.')[1];
+        const decodedPayload = atob(payload);
+        const payloadObject = JSON.parse(decodedPayload);
+        return payloadObject.role || payloadObject.role || null;
+    } catch (error) {
+        // console.error('Invalid JWT Token:', error);
+        return null;
+    }
+}

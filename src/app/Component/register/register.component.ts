@@ -10,18 +10,20 @@ import { PasswordModule } from 'primeng/password';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ToastrService } from 'ngx-toastr';
-import { passwordStrengthValidator } from '../../Validators/Password_validator';
+import { matchPasswords, passwordStrengthValidator } from '../../Validators/Password_validator';
 import { MessagesModule } from 'primeng/messages';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { environment } from '../../../environments/environment';
+import { AuthService } from '../../services/auth.service';
+import { CheckboxModule } from 'primeng/checkbox';
 @Component({
   selector: 'app-register',
   standalone: true,
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css'],
   imports: [
-    CommonModule,
+    CommonModule, CheckboxModule,
     ReactiveFormsModule,
     HttpClientModule,
     MatSnackBarModule,
@@ -31,7 +33,8 @@ import { environment } from '../../../environments/environment';
     CardModule,
     MessagesModule,
     MessagesModule,
-    ToastModule
+    ToastModule,
+
   ], encapsulation: ViewEncapsulation.None,
   providers: [MessageService]
 })
@@ -45,13 +48,20 @@ export class RegisterComponent {
     private router: Router,
     private snackBar: MatSnackBar,
     private toastr: ToastrService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private authService: AuthService,
   ) {
     this.registerForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6), passwordStrengthValidator()],],
-    });
+      confirmpassword: ['', [Validators.required, Validators.minLength(6)],],
+      isAdmin: [false],
+    },
+      {
+        validator: matchPasswords('password', 'confirmpassword')
+      }
+    );
   }
   get password() {
     return this.registerForm.get('password');
@@ -60,18 +70,21 @@ export class RegisterComponent {
     this.registerForm.reset();
   }
   onSubmit() {
-    console.log("sumitting:");
-    const formData = new FormData();
-    formData.append("FirstName", this.registerForm.value.firstName);
-    formData.append("email", this.registerForm.value.email);
-    formData.append("password", this.registerForm.value.password);
-    const headers = {};
-    this.http.post(this.apiUrl, formData, { headers })
+    const requestData = {
+      FirstName: this.registerForm.value.firstName,
+      Email: this.registerForm.value.email,
+      Password: this.registerForm.value.password,
+      isAdmin: this.registerForm.value.isAdmin ?? false
+    };
+    this.http.post(this.apiUrl, requestData, {
+      headers: { 'Content-Type': 'application/json' }
+    }
+    )
       .subscribe({
         next: (response: any) => {
-          console.log("next:");
-          console.log(response.success);
-          console.log(response.message);
+          // console.log("next:");
+          // console.log(response.success);
+          // console.log(response.message);
           if (response.statusCode != 201) {
             this.showMessage(response.message || 'Something went wrong', 'error');
             return
@@ -79,6 +92,12 @@ export class RegisterComponent {
           this.showMesssage(response.message, 'success');
           this.router.navigateByUrl('/login');
           this.registerForm.reset();
+
+
+
+
+
+
         }, // Clear form after success}
         error: error => {
           const errorMsg = error.error?.message || "Something went wrong. Please try again.";
@@ -104,6 +123,9 @@ export class RegisterComponent {
       closable: true
     });
   }
+  clickcheck() {
+    console.log(this.registerForm.value.isAdmin);
 
+  }
 }
 

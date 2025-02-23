@@ -12,6 +12,7 @@
 .register-card {
     width: 400px;
     padding: 30px;
+    height: auto;
     background: #fff;
     /* White background */
     border-radius: 12px;

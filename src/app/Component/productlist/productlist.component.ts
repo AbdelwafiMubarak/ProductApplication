@@ -10,7 +10,7 @@ import { PanelModule } from 'primeng/panel';
 import { ConfirmationService } from 'primeng/api';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import { DropdownModule } from 'primeng/dropdown';
@@ -22,12 +22,14 @@ import autoTable from 'jspdf-autotable';
 import { PageFilterDTO, Product } from '../../Models/product';
 import { debounceTime, Subject } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { TooltipModule } from 'primeng/tooltip';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 @Component({
   selector: 'app-productlist',
   standalone: true,
   templateUrl: './productlist.component.html',
   styleUrls: ['./productlist.component.css'],
-  imports: [CommonModule, TableModule, ButtonModule, CardModule, PanelModule, ConfirmDialogModule, FormsModule, DialogModule, InputTextModule, DropdownModule, FileUploadModule,],
+  imports: [CommonModule, TableModule, ButtonModule, ReactiveFormsModule, ReactiveFormsModule, CardModule, PanelModule, ConfirmDialogModule, FormsModule, DialogModule, InputTextModule, DropdownModule, FileUploadModule, TooltipModule],
   providers: [ConfirmationService, MessageService,]
 })
 export class ProductListComponent implements OnInit {
@@ -64,10 +66,32 @@ export class ProductListComponent implements OnInit {
   selectedProduct: Product = { id: 0, name: '', description: '', imageUrl: '', price: 0, createdBy: '' };
   selectedFile: File | null = null;
   fileError = false;
+
+  sortDirections: { [key: string]: 'asc' | 'desc' } = { name: 'asc', price: 'asc' }; // T
   fileErrorMessage: string = '';
   currentUserEmail: string | null = null;
+  imageUrl: SafeUrl | null = null;
+  //add new broduct
+  addproductForm: FormGroup;
+  addselectedFile: File | null = null;
+  addfileError = false;
+  addapiUrl = environment.Product.AddProductAsyncURL;
+  fileUrl = environment.file.GetFileURL;
+  addfileErrorMessage: string = '';
+  addprductdailuge = false;
+
   constructor(private http: HttpClient, private router: Router, private confirmationService: ConfirmationService,
-    private toastr: ToastrService, private jwtUtil: JwtUtilService, private messageService: MessageService) { }
+    private toastr: ToastrService, private jwtUtil: JwtUtilService, private messageService: MessageService, private sanitizer: DomSanitizer,
+    private fb: FormBuilder,
+
+
+  ) {
+    this.addproductForm = this.fb.group({
+      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
+      description: ['', [Validators.required, Validators.minLength(5)]],
+      price: ['', [Validators.required, Validators.pattern('^[0-9]+(\\.[0-9]{1,2})?$')]],
+    });
+  }
   ngOnInit() {
     this.currentUserEmail = localStorage.getItem('user') ?? null;
     this.filterSubject.pipe(
@@ -252,67 +276,48 @@ export class ProductListComponent implements OnInit {
   }
 
   showImagePopup(imageUrl: string) {
+    console.log("showImagePopup");
+    console.log(imageUrl);
+
+    this.loadImage(imageUrl)
     this.popupImageUrl = imageUrl;
     this.displayImagePopup = true;
   }
 
   hideImagePopup() {
-    this.displayImagePopup = false;
+    setTimeout(() => {
+      this.displayImagePopup = false;
+      this.imageUrl = null;
+    }, 500);
   }
 
-  downloadSelectedProducts(id: number) {
-    console.log("download hit");
 
-    const selectedProducttodownload = this.products.find(p => p.id === id);
-    if (!selectedProducttodownload) {
+
+  downloadAllProducts() {
+    if (!this.products || this.products.length === 0) {
+      console.warn("No products available to download.");
       return;
     }
-
     const doc = new jsPDF();
     doc.setFontSize(16);
-    doc.text('Selected Product Details', 14, 15);
-
+    doc.text('Product List', 14, 15);
     const headers = [['ID', 'Name', 'Description', 'Price']];
-    const data = [[
-      selectedProducttodownload.id,
-      selectedProducttodownload.name,
-      selectedProducttodownload.description,
-      selectedProducttodownload.price,
-    ]];
-
-    // Generate table and capture the ending Y position
+    const data = this.products.map(p => [p.id, p.name, p.description, p.price]);
     autoTable(doc, {
       startY: 25, // Position after the title
       head: headers,
       body: data,
       theme: 'striped',
       styles: { fontSize: 10, cellPadding: 3 },
-      headStyles: { fillColor: [41, 128, 185], textColor: 255, fontStyle: 'bold' },
-      didDrawPage: (data) => {
-        const finalY = (data.cursor?.y ?? 80) + 10; // Position image 10 units below the table
-
-        if (selectedProducttodownload.imageUrl) {
-          fetch(selectedProducttodownload.imageUrl)
-            .then(response => response.blob())
-            .then(blob => {
-              const reader = new FileReader();
-              reader.onloadend = () => {
-                const base64Image = reader.result as string;
-                doc.addImage(base64Image, 'JPEG', 14, finalY, 100, 50);
-                doc.save(`${selectedProducttodownload.name}.pdf`);
-              };
-              reader.readAsDataURL(blob);
-            })
-            .catch(error => {
-              console.error('Error loading image:', error);
-              doc.save(`${selectedProducttodownload.name}.pdf`); // Save even if image fails
-            });
-        } else {
-          doc.save(`${selectedProducttodownload.name}.pdf`);
-        }
-      }
+      headStyles: { fillColor: [41, 128, 185], textColor: 255, fontStyle: 'bold' }
     });
+
+    doc.save('Product_List.pdf');
   }
+
+
+
+
 
   onFileChange(event: any) {
     this.fileErrorMessage = ''; // Reset error message
@@ -349,29 +354,24 @@ export class ProductListComponent implements OnInit {
     this.selectedFile = null;
 
   }
-  toggleOptions(productId: number) {
-    this.showOptions[productId] = !this.showOptions[productId];
-  }
-  @HostListener('document:click', ['$event'])
-  handleClickOutside(event: Event): void {
-    // If the clicked element is not inside the dropdown or the toggle button, close the dropdown
-    const clickedElement = event.target as HTMLElement;
-    if (!clickedElement.closest('.dropdown-container')) {
-      this.showOptions = {}; // Close all dropdowns
-    }
-  }
-  namesorting() {
 
-    this.productFilter.NameAscending = !this.productFilter.NameAscending;
-    this.productFilter.NameDecending = !this.productFilter.NameDecending;
-    this.newfetch();
-  }
 
   newfetch() {
     const token = localStorage.getItem('authToken');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     this.loading = true;
-    this.apiUrl = `${environment.Product.GetProductPageURL}?NameAscending=${this.productFilter.NameAscending}&NameDecending=${this.productFilter.NameDecending}&PriceMin=${this.productFilter.PriceMin}&PriceMax=${this.productFilter.PriceMax}&PageNumber=${this.productFilter.PageNumber}&PageSize=${this.productFilter.PageSize}&Name_search=${this.productFilter.Name_search}`;
+    const encodedSearchQuery = encodeURIComponent(this.productFilter.Name_search ?? "");
+    const role = localStorage.getItem('role') ?? "User";
+
+    console.log(role);
+    console.log("role");
+
+    const EndPointUrl = role == "User" ? environment.Product.GetProductPageURL : environment.Product.AdminGetProductPageURL;
+    console.log("EndPointUrl");
+    console.log(EndPointUrl);
+
+    // this.apiUrl = `${environment.Product.GetProductPageURL}?NameAscending=${this.productFilter.NameAscending}&NameDecending=${this.productFilter.NameDecending}&PriceMin=${this.productFilter.PriceMin}&PriceMax=${this.productFilter.PriceMax}&PageNumber=${this.productFilter.PageNumber}&PageSize=${this.productFilter.PageSize}&Name_search=${encodedSearchQuery}`;
+    this.apiUrl = `${EndPointUrl}?NameAscending=${this.productFilter.NameAscending}&NameDecending=${this.productFilter.NameDecending}&PriceMin=${this.productFilter.PriceMin}&PriceMax=${this.productFilter.PriceMax}&PageNumber=${this.productFilter.PageNumber}&PageSize=${this.productFilter.PageSize}&Name_search=${encodedSearchQuery}`;
     this.http.get<Product[]>(this.apiUrl, { headers, observe: 'response' }).subscribe({
       next: (response: any) => {
         if (response.body.statusCode != 200) {
@@ -399,6 +399,115 @@ export class ProductListComponent implements OnInit {
     });
   }
 
+  customSort1(field: 'name' | 'price') {
+    console.log(`Sorting by: ${field}, Direction: ${this.sortDirections[field]}`);
+
+    this.products = [...this.products].sort((a, b) => {
+      if (field === 'name') {
+        return this.sortDirections[field] === 'asc'
+          ? a.name.localeCompare(b.name)
+          : b.name.localeCompare(a.name);
+      } else if (field === 'price') {
+        return this.sortDirections[field] === 'asc'
+          ? a.price - b.price
+          : b.price - a.price;
+      }
+      return 0;
+    });
+
+    // Toggle sorting direction
+    this.sortDirections[field] = this.sortDirections[field] === 'asc' ? 'desc' : 'asc';
+  }
+
+
+
+  onSubmit() {
+    if (this.addproductForm.invalid || !this.selectedFile) {
+      this.fileError = !this.selectedFile; // Show error if no file is selected
+      this.showMessage('Please fill all fields correctly and select a file!', 'error');
+      return;
+    }
+    const formData = new FormData();
+    formData.append('name', this.addproductForm.get('name')?.value);
+    formData.append('description', this.addproductForm.get('description')?.value);
+    formData.append('price', this.addproductForm.get('price')?.value);
+    formData.append('file', this.selectedFile, this.selectedFile.name);
+    const token = localStorage.getItem('authToken');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    this.http.post(this.addapiUrl, formData, { headers }).subscribe({
+      next: (response: any) => {
+        if (response.statusCode != 201) {
+          this.showMessage(response.message || 'Something went wrong', 'error');
+          return
+        }
+        this.showMessage('Product created successfully!', 'success');
+        // this.router.navigateByUrl('/productlist');
+        this.addproductForm.reset();
+        this.addselectedFile = null;
+        this.addprductdailuge = false;
+        this.newfetch();
+      },
+      error: (error) => {
+        console.error('Error creating product:', error);
+        this.showMessage(error.error?.message || 'Something went wrong.', 'error');
+      }
+    });
+  }
+  adddilogswitch() {
+    this.addprductdailuge = true;
+  }
+
+  addonFileChange(event: any) {
+    this.addfileErrorMessage = '';
+    const file = event.files[0];
+    if (!file) {
+      this.addfileErrorMessage = 'Please select a file.';
+      return;
+    }
+    if (file.size > 3145728) {
+      this.addfileErrorMessage = 'Maximum upload size is 3MB.';
+      return;
+    }
+    const allowedTypes = ['image/jpeg', 'image/png'];
+    if (!allowedTypes.includes(file.type)) {
+      this.addfileErrorMessage = 'Only JPG and PNG images are allowed.';
+      return;
+    }
+
+    this.addselectedFile = file;
+  }
+
+  addhandleFileError(event: any) {
+    this.addfileErrorMessage = 'Error uploading file. Ensure it is a valid image and within the size limit.';
+  }
+
+
+  loadImage(fileName: string) {
+    console.log("Downloading file:", fileName);
+    const fileUrl = `${this.fileUrl}/${fileName}`;
+    console.log("File URL:", fileUrl);
+
+    const token = localStorage.getItem('authToken');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+    this.http.get(fileUrl, { headers, responseType: 'blob' }).subscribe(
+      blob => {
+        console.log("File downloaded successfully");
+
+        const objectUrl = URL.createObjectURL(blob);
+        this.imageUrl = this.sanitizer.bypassSecurityTrustUrl(objectUrl);
+
+        console.log("Image URL:", this.imageUrl);
+      },
+      error => {
+        console.error("Error loading image:", error);
+      }
+    );
+  }
+
+
+
 }
+
 
 
