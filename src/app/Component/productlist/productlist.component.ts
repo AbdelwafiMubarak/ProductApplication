@@ -201,7 +201,7 @@ export class ProductListComponent implements OnInit {
           return
         }
         this.products = this.products.filter(product => product.id !== id);
-        console.log('Product deleted successfully.');
+        // console.log('Product deleted successfully.');
         this.showMessage(response.message || 'Product deleted successfully', 'success');
         this.newfetch();
       },
@@ -278,8 +278,8 @@ export class ProductListComponent implements OnInit {
   }
 
   showImagePopup(imageUrl: string) {
-    console.log("showImagePopup");
-    console.log(imageUrl);
+    // console.log("showImagePopup");
+    // console.log(imageUrl);
 
     this.loadImage(imageUrl)
     this.popupImageUrl = imageUrl;
@@ -290,7 +290,7 @@ export class ProductListComponent implements OnInit {
     setTimeout(() => {
       this.displayImagePopup = false;
       this.imageUrl = null;
-    }, 500);
+    }, 300);
   }
 
 
@@ -299,6 +299,7 @@ export class ProductListComponent implements OnInit {
 
     await this.fetchtodownload()
 
+    // if (!this.downloadproducts || this.downloadproducts.length === 0) {
     if (!this.downloadproducts || this.downloadproducts.length === 0) {
       console.warn("No products available to download.");
       return;
@@ -307,6 +308,7 @@ export class ProductListComponent implements OnInit {
     doc.setFontSize(16);
     doc.text('Product List', 14, 15);
     const headers = [['ID', 'Name', 'Description', 'Price']];
+    // const data = this.downloadproducts.map(p => [p.id, p.name, p.description, p.price]);
     const data = this.downloadproducts.map(p => [p.id, p.name, p.description, p.price]);
     autoTable(doc, {
       startY: 25, // Position after the title
@@ -374,7 +376,7 @@ export class ProductListComponent implements OnInit {
 
     const EndPointUrl = role == "User" ? environment.Product.GetProductPageURL : environment.Product.AdminGetProductPageURL;
     // console.log("EndPointUrl");
-    console.log(this.productFilter.NameAscending);
+    // console.log(this.productFilter.NameAscending);
 
     // this.apiUrl = `${environment.Product.GetProductPageURL}?NameAscending=${this.productFilter.NameAscending}&NameDecending=${this.productFilter.NameDecending}&PriceMin=${this.productFilter.PriceMin}&PriceMax=${this.productFilter.PriceMax}&PageNumber=${this.productFilter.PageNumber}&PageSize=${this.productFilter.PageSize}&Name_search=${encodedSearchQuery}`;
     this.apiUrl = `${EndPointUrl}?NameAscending=${this.productFilter.NameAscending}&NameDecending=${this.productFilter.NameDecending}&PriceMin=${this.productFilter.PriceMin}&PriceMax=${this.productFilter.PriceMax}&PageNumber=${this.productFilter.PageNumber}&PageSize=${this.productFilter.PageSize}&Name_search=${encodedSearchQuery}`;
@@ -406,7 +408,7 @@ export class ProductListComponent implements OnInit {
   }
 
   customSort1(field: 'name' | 'price') {
-    console.log(`Sorting by: ${field}, Direction: ${this.sortDirections[field]}`);
+    // console.log(`Sorting by: ${field}, Direction: ${this.sortDirections[field]}`);
 
     this.products = [...this.products].sort((a, b) => {
       if (field === 'name') {
@@ -451,8 +453,7 @@ export class ProductListComponent implements OnInit {
         this.addproductForm.reset();
         this.addselectedFile = null;
         this.addprductdailuge = false;
-        console.log(response);
-
+        // console.log(response);
         if (response.data) {
           setTimeout(() => {
             this.products = [...this.products, response.data]; // ✅ Adds the new product without mutating original array
@@ -498,21 +499,21 @@ export class ProductListComponent implements OnInit {
 
 
   loadImage(fileName: string) {
-    console.log("Downloading file:", fileName);
+    // console.log("Downloading file:", fileName);
     const fileUrl = `${this.fileUrl}/${fileName}`;
-    console.log("File URL:", fileUrl);
+    // console.log("File URL:", fileUrl);
 
     const token = localStorage.getItem('authToken');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
     this.http.get(fileUrl, { headers, responseType: 'blob' }).subscribe(
       blob => {
-        console.log("File downloaded successfully");
+        // console.log("File downloaded successfully");
 
         const objectUrl = URL.createObjectURL(blob);
         this.imageUrl = this.sanitizer.bypassSecurityTrustUrl(objectUrl);
 
-        console.log("Image URL:", this.imageUrl);
+        // console.log("Image URL:", this.imageUrl);
       },
       error => {
         console.error("Error loading image:", error);
@@ -535,9 +536,11 @@ export class ProductListComponent implements OnInit {
           this.showMessage(response.message || 'Download faild', 'error');
           return
         }
+        if (response.body.statusCode == 200) {
 
-        this.downloadproducts = response.body.data;
 
+          this.downloadproducts = response.body.data;
+        }
 
       },
 
