@@ -1,4 +1,4 @@
-export const BaseGatewayUrl = 'https://localhost:32772';
+export const BaseGatewayUrl = 'https://localhost:32784';
 export const environment = {
     production: false,
     Product: {
@@ -7,6 +7,7 @@ export const environment = {
         DeleteProductAsyncURL: `${BaseGatewayUrl}/productservice/Product/DeleteProductAsync`,
         GetProductPageURL: `${BaseGatewayUrl}/productservice/product/GetProductPage`,
         AdminGetProductPageURL: `${BaseGatewayUrl}/productservice/product/AdminGetProductPage`,
+        GetAllOrderdIdAsendingURL: `${BaseGatewayUrl}/productservice/product/GetAllOrderdIdAsending`,
     },
     Account: {
         RegisterURL: `${BaseGatewayUrl}/auth/account/Register`,

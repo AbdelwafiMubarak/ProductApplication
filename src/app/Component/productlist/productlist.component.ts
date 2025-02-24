@@ -1,9 +1,9 @@
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessageService } from 'primeng/api';
-import { Component, HostListener, importProvidersFrom, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, importProvidersFrom, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CommonModule, } from '@angular/common';
-import { TableModule } from 'primeng/table';
+import { Table, TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { PanelModule } from 'primeng/panel';
@@ -20,7 +20,7 @@ import { JwtUtilService } from '../../services/JwtUtilService';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { PageFilterDTO, Product } from '../../Models/product';
-import { debounceTime, Subject } from 'rxjs';
+import { debounceTime, Subject, timeout } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { TooltipModule } from 'primeng/tooltip';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
@@ -34,14 +34,16 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 })
 export class ProductListComponent implements OnInit {
   @ViewChild('fileUpload', { static: false }) fileUpload: FileUpload | undefined;// 
+  @ViewChild('dt') dt: Table | undefined;
   products: Product[] = [];
+  downloadproducts: Product[] = [];
   loading: boolean = true;
   showOptions: { [productId: number]: boolean } = {};
   apiUrl = '';
   UpdateUrl = environment.Product.UpdateProductAsyncURL;
   DeleteUrl = environment.Product.DeleteProductAsyncURL;
   productFilter: PageFilterDTO = {
-    NameAscending: true,
+    NameAscending: false,
     NameDecending: false,
     PriceMin: 0,
     PriceMax: 0,
@@ -80,14 +82,14 @@ export class ProductListComponent implements OnInit {
   addfileErrorMessage: string = '';
   addprductdailuge = false;
 
-  constructor(private http: HttpClient, private router: Router, private confirmationService: ConfirmationService,
+  constructor(private http: HttpClient, private router: Router, private confirmationService: ConfirmationService, private cdr: ChangeDetectorRef,
     private toastr: ToastrService, private jwtUtil: JwtUtilService, private messageService: MessageService, private sanitizer: DomSanitizer,
     private fb: FormBuilder,
 
 
   ) {
     this.addproductForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
+      name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
       description: ['', [Validators.required, Validators.minLength(5)]],
       price: ['', [Validators.required, Validators.pattern('^[0-9]+(\\.[0-9]{1,2})?$')]],
     });
@@ -258,7 +260,7 @@ export class ProductListComponent implements OnInit {
   }
   resetFilter() {
     this.filterText = "";
-    this.productFilter.NameAscending = true;
+    this.productFilter.NameAscending = false;
     this.productFilter.NameDecending = false;
     this.productFilter.PriceMin = 0;
     this.productFilter.PriceMax = 0;
@@ -293,8 +295,11 @@ export class ProductListComponent implements OnInit {
 
 
 
-  downloadAllProducts() {
-    if (!this.products || this.products.length === 0) {
+  async downloadAllProducts() {
+
+    await this.fetchtodownload()
+
+    if (!this.downloadproducts || this.downloadproducts.length === 0) {
       console.warn("No products available to download.");
       return;
     }
@@ -302,7 +307,7 @@ export class ProductListComponent implements OnInit {
     doc.setFontSize(16);
     doc.text('Product List', 14, 15);
     const headers = [['ID', 'Name', 'Description', 'Price']];
-    const data = this.products.map(p => [p.id, p.name, p.description, p.price]);
+    const data = this.downloadproducts.map(p => [p.id, p.name, p.description, p.price]);
     autoTable(doc, {
       startY: 25, // Position after the title
       head: headers,
@@ -313,6 +318,7 @@ export class ProductListComponent implements OnInit {
     });
 
     doc.save('Product_List.pdf');
+    this.downloadproducts = [];
   }
 
 
@@ -363,12 +369,12 @@ export class ProductListComponent implements OnInit {
     const encodedSearchQuery = encodeURIComponent(this.productFilter.Name_search ?? "");
     const role = localStorage.getItem('role') ?? "User";
 
-    console.log(role);
-    console.log("role");
+    // console.log(role);
+    // console.log("role");
 
     const EndPointUrl = role == "User" ? environment.Product.GetProductPageURL : environment.Product.AdminGetProductPageURL;
-    console.log("EndPointUrl");
-    console.log(EndPointUrl);
+    // console.log("EndPointUrl");
+    console.log(this.productFilter.NameAscending);
 
     // this.apiUrl = `${environment.Product.GetProductPageURL}?NameAscending=${this.productFilter.NameAscending}&NameDecending=${this.productFilter.NameDecending}&PriceMin=${this.productFilter.PriceMin}&PriceMax=${this.productFilter.PriceMax}&PageNumber=${this.productFilter.PageNumber}&PageSize=${this.productFilter.PageSize}&Name_search=${encodedSearchQuery}`;
     this.apiUrl = `${EndPointUrl}?NameAscending=${this.productFilter.NameAscending}&NameDecending=${this.productFilter.NameDecending}&PriceMin=${this.productFilter.PriceMin}&PriceMax=${this.productFilter.PriceMax}&PageNumber=${this.productFilter.PageNumber}&PageSize=${this.productFilter.PageSize}&Name_search=${encodedSearchQuery}`;
@@ -445,7 +451,16 @@ export class ProductListComponent implements OnInit {
         this.addproductForm.reset();
         this.addselectedFile = null;
         this.addprductdailuge = false;
+        console.log(response);
+
+        if (response.data) {
+          setTimeout(() => {
+            this.products = [...this.products, response.data]; // ✅ Adds the new product without mutating original array
+          });
+        }
+        this.dt?.reset();
         this.newfetch();
+        this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('Error creating product:', error);
@@ -503,6 +518,35 @@ export class ProductListComponent implements OnInit {
         console.error("Error loading image:", error);
       }
     );
+  }
+  fetchtodownload() {
+    const token = localStorage.getItem('authToken');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+
+
+    const EndPointUrl = environment.Product.GetAllOrderdIdAsendingURL;
+
+    this.http.get<Product[]>(EndPointUrl, { headers, observe: 'response' }).subscribe({
+      next: (response: any) => {
+
+        if (response.body.statusCode != 200) {
+
+
+          this.showMessage(response.message || 'Download faild', 'error');
+          return
+        }
+
+        this.downloadproducts = response.body.data;
+
+
+      },
+
+      error: (error) => {
+        this.showMessage(error.message || 'Download faild ', 'error');
+        console.error('Error fetching products to download:', error);
+        this.loading = false;
+      }
+    });
   }
 
 
