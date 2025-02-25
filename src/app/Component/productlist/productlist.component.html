@@ -7,24 +7,30 @@
             <button (click)="adddilogswitch()" pButton type="button" label="Add product " icon="pi pi-plus"
                 class="p-button-success"></button>
         </div>
-        <button pButton label="Export" (click)="downloadAllProducts()" icon="pi pi-download"
+        <!-- <button pButton label="Export" (click)="downloadAllProducts()" icon="pi pi-download"
             class="p-button-sm p-button-info export-button"
-            style="  display: block; margin-left: auto;margin-top: 5px; width: 162px;"></button>
+            style="  display: block; margin-left: auto;margin-top: 5px; width: 162px;"></button> -->
     </ng-template>
     <ng-template pTemplate="content">
-        <div class="p-inputgroup responsive-input-group" style="display: flex; justify-content: flex-end;">
+
+        <!-- <div class="p-inputgroup responsive-input-group" style="display: flex; justify-content: flex-end;"> -->
+        <div class="  responsive-input-group" style="display: flex; justify-content: flex-end;">
             <input type="text" pInputText placeholder="Search by name..." [(ngModel)]="filterText"
                 (ngModelChange)="onSearchChange()" (keydown.enter)="filterProductsByPrice()"
                 class="responsive-searsh" />
             <button pButton type="button" icon="pi pi-refresh" class="p-button-secondary"
                 (click)="resetFilter()"></button>
             <p-dropdown [options]="priceRanges" [(ngModel)]="selectedPriceRange" placeholder="Filter by Price"
-                [style]="{ width: '100%' ,'text-align': 'start'}" optionLabel="label"
+                [style]="{ width: '100%' ,'text-align': 'start',}" optionLabel="label"
                 (onChange)="filterProductsByPrice()">
-            </p-dropdown><span style="padding-left: 150px;"></span>
-
+            </p-dropdown>
+            <span style="margin-right: 30px; width: 180px;"></span>
+            <span style="margin-right: 30px; width: 180px;"></span>
+            <!-- class="p-button-sm p-button-info export-button" -->
+            <button pButton label="Export" (click)="downloadAllProducts()" icon="pi pi-download"
+                class="   p-button-secondary export-button  p-button-info ">
+            </button>
         </div>
-
         <p-table #dt [value]="products" [paginator]="true" [loading]="loading" [rows]="productFilter.PageSize"
             [lazy]="true" [sortMode]="'multiple'" [totalRecords]="totalRecords" (onPage)="onPageChange($event)">
             <!-- [rowsPerPageOptions]="[5, 10, 15]" -->

@@ -71,7 +71,7 @@ input[type="file"]:hover {
     flex-wrap: wrap;
     gap: 0.5rem;
     width: 100%;
-    max-width: 800px;
+    max-width: 1370px;
     align-items: center;
     justify-content: flex-start;
     margin: 0;
@@ -81,7 +81,19 @@ input[type="file"]:hover {
 .responsive-input-group button,
 .responsive-input-group p-dropdown {
     flex: 1 1 auto;
-    min-width: 150px;
+    /* min-width: 100px; */
+}
+
+.responsive-input-group input,
+.responsive-input-group button {
+    width: 2px;
+}
+
+.responsive-input-group p-dropdown
+
+/* .responsive-input-group input  */
+    {
+    width: 5px;
 }
 
 @media (max-width: 600px) {
@@ -152,6 +164,7 @@ p-dialog {
 
 .export-button {
     margin-left: true;
+    max-width: 110px;
     /* Moves the button to the right */
 }
 
@@ -171,6 +184,12 @@ p-dialog {
         display: flex;
         gap: 10px;
         width: 100%;
+    }
+
+    .export-button {
+        margin-left: true;
+        max-width: 100%;
+        /* Moves the button to the right */
     }
 }
 
