@@ -68,7 +68,6 @@ export class ProductListComponent implements OnInit {
   selectedProduct: Product = { id: 0, name: '', description: '', imageUrl: '', price: 0, createdBy: '' };
   selectedFile: File | null = null;
   fileError = false;
-
   sortDirections: { [key: string]: 'asc' | 'desc' } = { name: 'asc', price: 'asc' }; // T
   fileErrorMessage: string = '';
   currentUserEmail: string | null = null;
@@ -81,12 +80,9 @@ export class ProductListComponent implements OnInit {
   fileUrl = environment.file.GetFileURL;
   addfileErrorMessage: string = '';
   addprductdailuge = false;
-
   constructor(private http: HttpClient, private router: Router, private confirmationService: ConfirmationService, private cdr: ChangeDetectorRef,
     private toastr: ToastrService, private jwtUtil: JwtUtilService, private messageService: MessageService, private sanitizer: DomSanitizer,
     private fb: FormBuilder,
-
-
   ) {
     this.addproductForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
@@ -285,20 +281,14 @@ export class ProductListComponent implements OnInit {
     this.popupImageUrl = imageUrl;
     this.displayImagePopup = true;
   }
-
   hideImagePopup() {
     setTimeout(() => {
       this.displayImagePopup = false;
       this.imageUrl = null;
     }, 300);
   }
-
-
-
   async downloadAllProducts() {
-
     await this.fetchtodownload()
-
     // if (!this.downloadproducts || this.downloadproducts.length === 0) {
     if (!this.downloadproducts || this.downloadproducts.length === 0) {
       console.warn("No products available to download.");
@@ -307,9 +297,10 @@ export class ProductListComponent implements OnInit {
     const doc = new jsPDF();
     doc.setFontSize(16);
     doc.text('Product List', 14, 15);
-    const headers = [['ID', 'Name', 'Description', 'Price']];
+    // const headers = [['ID', 'Name', 'Description', 'Price']];
+    const headers = [['Name', 'Owner', 'Description', 'Price']];
     // const data = this.downloadproducts.map(p => [p.id, p.name, p.description, p.price]);
-    const data = this.downloadproducts.map(p => [p.id, p.name, p.description, p.price]);
+    const data = this.downloadproducts.map(p => [p.name, p.createdBy, p.description, p.price]);
     autoTable(doc, {
       startY: 25, // Position after the title
       head: headers,
@@ -318,7 +309,6 @@ export class ProductListComponent implements OnInit {
       styles: { fontSize: 10, cellPadding: 3 },
       headStyles: { fillColor: [41, 128, 185], textColor: 255, fontStyle: 'bold' }
     });
-
     doc.save('Product_List.pdf');
     this.downloadproducts = [];
   }
@@ -352,18 +342,14 @@ export class ProductListComponent implements OnInit {
 
     this.selectedFile = file; // Store valid file
   }
-
   handleFileError(event: any) {
     this.fileErrorMessage = 'Error uploading file. Ensure it is a valid image and within the size limit.';
   }
-
   reseterr() {
     this.fileError = false
     this.selectedFile = null;
 
   }
-
-
   newfetch() {
     const token = localStorage.getItem('authToken');
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
@@ -406,7 +392,6 @@ export class ProductListComponent implements OnInit {
       }
     });
   }
-
   customSort1(field: 'name' | 'price') {
     // console.log(`Sorting by: ${field}, Direction: ${this.sortDirections[field]}`);
 
@@ -426,9 +411,6 @@ export class ProductListComponent implements OnInit {
     // Toggle sorting direction
     this.sortDirections[field] = this.sortDirections[field] === 'asc' ? 'desc' : 'asc';
   }
-
-
-
   onSubmit() {
     if (this.addproductForm.invalid || !this.selectedFile) {
       this.fileError = !this.selectedFile; // Show error if no file is selected
@@ -472,7 +454,6 @@ export class ProductListComponent implements OnInit {
   adddilogswitch() {
     this.addprductdailuge = true;
   }
-
   addonFileChange(event: any) {
     this.addfileErrorMessage = '';
     const file = event.files[0];
@@ -492,12 +473,9 @@ export class ProductListComponent implements OnInit {
 
     this.addselectedFile = file;
   }
-
   addhandleFileError(event: any) {
     this.addfileErrorMessage = 'Error uploading file. Ensure it is a valid image and within the size limit.';
   }
-
-
   loadImage(fileName: string) {
     // console.log("Downloading file:", fileName);
     const fileUrl = `${this.fileUrl}/${fileName}`;
@@ -551,9 +529,6 @@ export class ProductListComponent implements OnInit {
       }
     });
   }
-
-
-
 }
 
 

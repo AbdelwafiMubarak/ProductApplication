@@ -71,7 +71,7 @@ input[type="file"]:hover {
     flex-wrap: wrap;
     gap: 0.5rem;
     width: 100%;
-    max-width: 1370px;
+    max-width: 1375px;
     align-items: center;
     justify-content: flex-start;
     margin: 0;
@@ -165,6 +165,7 @@ p-dialog {
 .export-button {
     margin-left: true;
     max-width: 110px;
+
     /* Moves the button to the right */
 }
 
