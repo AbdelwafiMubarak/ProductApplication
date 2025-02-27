@@ -1,0 +1,44 @@
+<p-confirmDialog></p-confirmDialog>
+<p-card>
+    <ng-template pTemplate="title">
+        <div class="title-container responsive-button">
+            <span class=" responsive-title">User Board</span>
+        </div>
+    </ng-template>
+    <p-table #dt [value]="users" [paginator]="true" [loading]="loading" [rows]=4 [sortMode]="'multiple'">
+        <!-- [rowsPerPageOptions]="[5, 10, 15]" -->
+        <ng-template pTemplate="header">
+            <tr>
+                <th pSortableColumn="name" (click)="customSort1( )" style="width: 250px;">User Name
+                    <p-sortIcon field="name"></p-sortIcon>
+                </th>
+                <th style="width: 250px;"> Email </th>
+                <th style="width: 300px;"> Role </th>
+                <th style="width: 200px">Actions</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-User>
+            <tr>
+                <td>{{ User.name }}</td>
+                <td>{{ User.email }}</td>
+                <td>{{ User.role }}</td>
+                <td style="display: flex; gap: 5px; align-items: center;" class="action">
+                    <button pButton class="p-button-sm p-button-info" (click)="confirmupdate(User.email,1)"
+                        pTooltip="Admin Role" tooltipPosition="top" [disabled]="User.role =='Admin'">admin
+                    </button>
+                    <button pButton class="p-button-sm p-button-info" (click)="confirmupdate(User.email,0)"
+                        pTooltip="User Role" tooltipPosition="top" [disabled]="User.role =='User'">User
+                    </button>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="footer" style="width: 100px;">
+            <tr>
+                <td colspan="8" class="text-right"><strong>Total Users : {{users.length }}</strong></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </ng-template>
+        <h2>hhf</h2>
+    </p-table>
+</p-card>

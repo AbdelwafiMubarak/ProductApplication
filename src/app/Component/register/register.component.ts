@@ -74,7 +74,7 @@ export class RegisterComponent {
       FirstName: this.registerForm.value.firstName,
       Email: this.registerForm.value.email,
       Password: this.registerForm.value.password,
-      isAdmin: this.registerForm.value.isAdmin ?? false
+      // isAdmin: this.registerForm.value.isAdmin ?? false
     };
     this.http.post(this.apiUrl, requestData, {
       headers: { 'Content-Type': 'application/json' }

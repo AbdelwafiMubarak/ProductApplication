@@ -1,3 +1,5 @@
+/// <reference types="@angular/localize" />
+
 
 
 import { bootstrapApplication } from '@angular/platform-browser';
@@ -14,12 +16,15 @@ import { AuthGuard } from './app/services/auth.guard';
 import { provideHttpClient } from '@angular/common/http';
 import { CreateProductComponent } from './app/Component/createproduct/createproduct.component';
 import { provideToastr, ToastrModule } from 'ngx-toastr';
+import { UserlistComponent } from './app/userlist/userlist.component';
+import { adminGuard } from './app/services/admin.guard';
 const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'login', component: LoginComponent, canActivate: [GuestGuard] },
   { path: 'register', component: RegisterComponent, canActivate: [GuestGuard] },
   { path: 'productlist', component: ProductListComponent, canActivate: [AuthGuard] },
   { path: 'addproduct', component: CreateProductComponent, canActivate: [AuthGuard] },
+  { path: 'userlist', component: UserlistComponent, canActivate: [adminGuard] },
 ];
 bootstrapApplication(AppComponent, {
   providers: [provideHttpClient(),

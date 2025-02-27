@@ -38,6 +38,7 @@ export class NavbarComponent implements OnInit {
     this.leftMenuItems = this.isLoggedIn ? [
       { label: 'Home', icon: 'pi pi-home', routerLink: [''] },
       { label: 'Products', icon: 'pi pi-box', routerLink: ['/productlist'] },
+      { label: 'Users', icon: 'pi pi-box', routerLink: ['/userlist'] },
     ] : [];
     this.rightMenuItems = this.isLoggedIn
       ? [

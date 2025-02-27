@@ -13,7 +13,10 @@ export const environment = {
         RegisterURL: `${BaseGatewayUrl}/auth/account/Register`,
         TokenURL: `${BaseGatewayUrl}/auth/account/Token`,
         SetPasswordURL: `${BaseGatewayUrl}/auth/account/SetPassword`,
-        ForrgotPasswordURL: `${BaseGatewayUrl}/auth/account/ForgetPassword`
+        ForrgotPasswordURL: `${BaseGatewayUrl}/auth/account/ForgetPassword`,
+        GetUsersURL: `${BaseGatewayUrl}/auth/User/GetUsers`,
+        ChangeRoleURL: `${BaseGatewayUrl}/auth/User/ChangeRoleAsync`
+
     },
     file: {
         GetFileURL: `${BaseGatewayUrl}/processservice/file/files`,

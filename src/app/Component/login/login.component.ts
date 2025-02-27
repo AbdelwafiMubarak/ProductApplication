@@ -17,7 +17,7 @@ import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
 import { DialogModule } from 'primeng/dialog';
 import { matchPasswords, passwordStrengthValidator } from '../../Validators/Password_validator';
-import { getRoleFromToken } from '../../services/JwtUtilService';
+import { getEmailFromToken, getRoleFromToken } from '../../services/JwtUtilService';
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -108,7 +108,9 @@ export class LoginComponent {
           localStorage.setItem('authToken', response.data.token);
           localStorage.setItem('user', response.data.userName);
           let role = getRoleFromToken(response.data.token) ?? "User"
+          let UserEmail = getEmailFromToken(response.data.token) ?? " "
           localStorage.setItem('role', role);
+          localStorage.setItem('email', UserEmail);
           // console.log("roooooooooole");
           // console.log(getRoleFromToken(response.data.token));
           let user: string = response.data.token;
